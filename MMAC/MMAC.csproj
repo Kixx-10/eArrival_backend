@@ -23,9 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
     <Folder Include="DTOS\" />
-    <Folder Include="Services\" />
     <Folder Include="Validations\" />
     <Folder Include="Profiles\" />
   </ItemGroup>

@@ -1,0 +1,36 @@
+﻿
+using Microsoft.AspNetCore.Mvc;
+using MMAC.Services;
+
+namespace MMAC.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class PortOfArrivalController : ControllerBase
+    {
+        private readonly IPortOfArrivalService _portOfArrivalService;
+
+        public PortOfArrivalController(IPortOfArrivalService portOfArrivalService)
+        {
+            _portOfArrivalService = portOfArrivalService;
+        }
+
+        [HttpGet("by-mode/{modeOfTravelId}")]
+        public async Task<IActionResult> GetPortsByMode(int modeOfTravelId)
+        {
+            var ports = await _portOfArrivalService.GetPortsByModeOfTravelAsync(modeOfTravelId);
+
+            if (ports == null || !ports.Any())
+            {
+                return NotFound(new { message = "No ports found for this mode of travel." });
+            }
+
+
+            var result = ports.OrderBy(p => p.PortOfArrivalName)
+                .Select(p => p.PortOfArrivalName)
+                .ToList();
+
+            return Ok(result);
+        }
+    }
+}
