@@ -15,7 +15,7 @@ namespace MMAC.Controllers
             _portOfArrivalService = portOfArrivalService;
         }
 
-        [HttpGet("by-mode/{modeOfTravelId}")]
+        [HttpGet("{modeOfTravelId}")]
         public async Task<IActionResult> GetPortsByMode(int modeOfTravelId)
         {
             var ports = await _portOfArrivalService.GetPortsByModeOfTravelAsync(modeOfTravelId);
