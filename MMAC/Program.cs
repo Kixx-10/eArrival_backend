@@ -16,6 +16,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 // Indection for service
 builder.Services.AddScoped<IPortOfArrivalService, PortOfArrivalService>();
+builder.Services.AddScoped<IPurposeOfVisitService, PurposeOfVisitService>();
 
 var app = builder.Build();
 
