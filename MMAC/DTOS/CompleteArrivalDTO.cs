@@ -10,6 +10,7 @@
         public string Email { get; set; } = string.Empty;
         public string MobileNumber { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
+        public string VisaNo { get; set; } = string.Empty;
         public string NRC { get; set; } = string.Empty;
         public string FatherName { get; set; } = string.Empty;
         public string PassportNo { get; set; } = string.Empty;
