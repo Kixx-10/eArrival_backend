@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using MMAC.Models.Address;
 using MMAC.Models.Master;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -57,7 +58,11 @@ namespace MMAC.Models.Cores
         public string AddressInMyanmar { get; set; } = string.Empty;
 
 
+        [Required] // မဖြစ်မနေ ဖြည့်ရမည်ဟု သတ်မှတ်ခြင်း
         public int TownshipId { get; set; }
+
+        [ForeignKey("TownshipId")]
+        public virtual Township? Township { get; set; }
         public int DistrictId { get; set; }
         public int StateRegionId { get; set; }
 

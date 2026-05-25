@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MMAC.Models.Cores;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MMAC.Models.Address
@@ -32,5 +33,6 @@ namespace MMAC.Models.Address
         [Required]
         [Column(TypeName = "char(1)")]
         public string SystemUse { get; set; } = "Y";
+        public virtual ICollection<ArrivalApplication> ArrivalApplications { get; set; } = new List<ArrivalApplication>();
     }
 }

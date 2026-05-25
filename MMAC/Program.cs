@@ -1,5 +1,13 @@
+using AutoMapper;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using MMAC.Data;
+using MMAC.Profiles;
+using MMAC.Services;
+using MMAC.Services.ArrivalInterface;
+using MMAC.Validations;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +20,21 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+// Indection for service
+builder.Services.AddScoped<IPortOfArrivalService, PortOfArrivalService>();
+builder.Services.AddScoped<IPurposeOfVisitService, PurposeOfVisitService>();
+builder.Services.AddScoped<ICompleteArrival, CompleteArrivalService>();
+
+// AutoMapper Core Version 13 Configuration
+var mapperConfig = new MapperConfiguration(cfg =>
+{
+    cfg.AddProfile<CompleteArrivalMapper>();
+});
+IMapper mapper = mapperConfig.CreateMapper();
+builder.Services.AddSingleton(mapper);
+
+builder.Services.AddValidatorsFromAssemblyContaining<CompleteArrivalDTOValidator>();
+builder.Services.AddFluentValidationAutoValidation();
 
 var app = builder.Build();
 
@@ -19,6 +42,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseHttpsRedirection();
