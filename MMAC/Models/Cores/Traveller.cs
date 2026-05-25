@@ -51,13 +51,12 @@ namespace MMAC.Models.Cores
         [MaxLength(50)]
         public string VisaNo { get; set; } = string.Empty;
 
-        [Required]
         [MaxLength(30)]
-        public string NRC { get; set; } = string.Empty;
+        public string? NRC { get; set; }
 
         [Required]
         [MaxLength(50)]
-        public string FatherName { get; set; } = string.Empty;
+        public string? FatherName { get; set; }
 
         [Required]
         [MaxLength(20)]
