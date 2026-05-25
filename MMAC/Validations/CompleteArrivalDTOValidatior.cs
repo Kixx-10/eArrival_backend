@@ -16,8 +16,7 @@ namespace MMAC.Validations
                 .LessThan(DateTime.Today).WithMessage("DOB must be in the past");
             RuleFor(x => x.CountryOfBirthCode).NotEmpty().WithMessage("CountryOfBirthCode is required")
                 .MaximumLength(3).WithMessage("Code maximum 3");
-            RuleFor(x => x.FullName).NotEmpty().WithMessage("Name is required")
-                .MaximumLength(50).WithMessage("Name cannot more 50 characters");
+
             RuleFor(x => x.Email).NotEmpty().WithMessage("Email is required")
                 .MaximumLength(30).WithMessage("Email cannot more 30 characters")
                 .EmailAddress().WithMessage("Invalid email address");
@@ -25,10 +24,10 @@ namespace MMAC.Validations
                 .MaximumLength(20).WithMessage("Mobile No cannot more 20 characters");
             RuleFor(x => x.Address).NotEmpty().WithMessage("Address is required")
                 .MaximumLength(100).WithMessage("Address cannot more 100 characters");
-            RuleFor(x => x.NRC).NotEmpty().WithMessage("NRC is required")
-                .MaximumLength(30).WithMessage("NRC cannot more 30 characters");
-            RuleFor(x => x.FatherName).NotEmpty().WithMessage(" Father Name is required")
-                .MaximumLength(50).WithMessage("Father Name cannot more 50 characters");
+            //RuleFor(x => x.NRC).NotEmpty().WithMessage("NRC is required")
+            //    .MaximumLength(30).WithMessage("NRC cannot more 30 characters");
+            //RuleFor(x => x.FatherName).NotEmpty().WithMessage(" Father Name is required")
+            //    .MaximumLength(50).WithMessage("Father Name cannot more 50 characters");
             RuleFor(x => x.PassportNo).NotEmpty().WithMessage("PassportNo is required")
                 .MaximumLength(20).WithMessage("Passport cannot more 50 characters");
             RuleFor(x => x.IssuedCountryCode).NotEmpty().WithMessage("IssuedCountryCode is required")

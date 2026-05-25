@@ -18,6 +18,13 @@ namespace MMAC.Services.ArrivalInterface
         }
         public async Task<Guid> SubmitAsync(CompleteArrivalDTO dto)
         {
+            if (dto.CountryOfBirthCode == "MMR")
+            {
+                if (string.IsNullOrWhiteSpace(dto.NRC) || string.IsNullOrWhiteSpace(dto.FatherName))
+                {
+                    throw new ArgumentException("Need to fill NRC and FatherName for Myanmr Citizens");
+                }
+            }
             var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
