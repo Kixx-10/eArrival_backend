@@ -1,17 +1,15 @@
-﻿
-using Microsoft.EntityFrameworkCore;
-using MMAC.Data;
-using MMAC.Models.Master;
+﻿using MMAC.Models.Master;
+using MMAC.Repositories;
 
 namespace MMAC.Services
 {
     public class PurposeOfVisitService : IPurposeOfVisitService
     {
-        private readonly AppDbContext _context;
+        private readonly IPurposeOfVisitRepository _repository;
 
-        public PurposeOfVisitService(AppDbContext context)
+        public PurposeOfVisitService(IPurposeOfVisitRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
 
@@ -19,10 +17,7 @@ namespace MMAC.Services
         {
             try
             {
-                await _context.PurposeOfVisit.AddAsync(purposeOfVisit);
-                await _context.SaveChangesAsync();
-
-                return purposeOfVisit;
+                return await _repository.AddPurposeOfVisitAsync(purposeOfVisit);
             }
             catch (Exception ex)
             {
@@ -35,8 +30,7 @@ namespace MMAC.Services
         {
             try
             {
-                var response = await _context.PurposeOfVisit.ToListAsync();
-                return response;
+                return await _repository.GetAllPurposeOfVisitsAsync();
             }
             catch (Exception ex)
             {

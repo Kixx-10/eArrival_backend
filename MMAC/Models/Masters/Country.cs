@@ -15,12 +15,12 @@ namespace MMAC.Models.Master
         public string CountryCode { get; set; } = string.Empty;
 
         [Required]
-        [MaxLength(20)]
+        [MaxLength(50)]
         [Column(TypeName = "varchar(20)")]
         public string Name { get; set; } = string.Empty;
 
         [Required]
-        [MaxLength(30)]
+        [MaxLength(50)]
         public string NameMM { get; set; } = string.Empty;
 
         [Required]
