@@ -11,6 +11,8 @@ namespace MMAC.Services.UtilityService
         { 
             _context = context;
         }
+
+        #region Location 
         public async Task<IEnumerable<LocationDTO>> GetLocations()
         {
             try
@@ -40,5 +42,35 @@ namespace MMAC.Services.UtilityService
                 throw;
             }
         }
+        #endregion
+
+        #region NRC
+
+        public async Task<IEnumerable<NrcDTO>> GetNrcFormat()
+        {
+            try
+            {
+
+                var nrcs = await _context.NRC_StateRegion .AsNoTracking() .Select(sr => new NrcDTO
+                    {
+                        nrcState = sr,
+                        nrcTownships = _context.NRC_Township
+                                        .Where(t => t.NRC_SRId == sr .Id)
+                                        .ToList()
+                    })
+                    .ToListAsync();
+
+                return nrcs;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching NRCs: {ex.Message}");
+                throw;
+            }
+        }
+
+        #endregion
+
+
     }
 }

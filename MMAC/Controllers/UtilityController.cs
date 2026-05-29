@@ -18,7 +18,7 @@ namespace MMAC.Controllers
             _utilityService = utilityService;
         }
 
-        [HttpGet("locations")]
+        [HttpGet("Getlocations")]
         public async Task<ActionResult<IEnumerable<LocationDTO>>> GetLocations()
         {
             try
@@ -32,5 +32,23 @@ namespace MMAC.Controllers
                 return StatusCode(500, "An error occurred while retrieving the locations.");
             }
         }
+
+        [HttpGet("GetNRCFormat")]
+        public async Task<ActionResult<IEnumerable<NrcDTO>>> GetNrcFormat()
+        {
+            try
+            {
+                var nrcs = await _utilityService.GetNrcFormat();
+                return Ok(nrcs);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An error occurred while retrieving the NRC formats.");
+            }
+        }
     }
-}
+}       
+
+         
+          
+   
