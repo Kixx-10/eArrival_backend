@@ -6,6 +6,7 @@ using MMAC.Data;
 using MMAC.Profiles;
 using MMAC.Services;
 using MMAC.Services.ArrivalInterface;
+using MMAC.Services.UtilityService;
 using MMAC.Validations;
 using Scalar.AspNetCore;
 
@@ -24,6 +25,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddScoped<IPortOfArrivalService, PortOfArrivalService>();
 builder.Services.AddScoped<IPurposeOfVisitService, PurposeOfVisitService>();
 builder.Services.AddScoped<ICompleteArrival, CompleteArrivalService>();
+builder.Services.AddScoped<IUtilityService, UtilityService>();
+
 
 // AutoMapper Core Version 13 Configuration
 var mapperConfig = new MapperConfiguration(cfg =>
