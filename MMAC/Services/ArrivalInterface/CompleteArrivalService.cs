@@ -18,36 +18,30 @@ namespace MMAC.Services.ArrivalInterface
 
         public async Task<Guid> SubmitAsync(CompleteArrivalDTO dto)
         {
-<<<<<<< HEAD
-=======
-            if (dto.CountryOfBirthCode == "MMR")
-            {
-                if (string.IsNullOrWhiteSpace(dto.NRC) || string.IsNullOrWhiteSpace(dto.FatherName))
-                {
-                    throw new ArgumentException("Need to fill NRC and FatherName for Myanmr Citizens");
-                }
-            }
-            var transaction = await _context.Database.BeginTransactionAsync();
->>>>>>> ca168a563634162a9c9f1d0dea368b75d7bbe611
             try
             {
                 if (dto.CountryOfBirthCode == "MMR")
                 {
                     if (string.IsNullOrWhiteSpace(dto.NRC) || string.IsNullOrWhiteSpace(dto.FatherName))
                     {
-                        throw new ArgumentException("Need NRC and FatherName for Myanmar");
+                        throw new ArgumentException("Need NRC and FatherName for Myanmar Citizens");
                     }
                 }
+
                 var traveller = _mapper.Map<Traveller>(dto);
                 var arrivalApplication = _mapper.Map<ArrivalApplication>(dto);
-                //from repository method
                 return await _repository.SubmitArrivalApplicationAsync(traveller, arrivalApplication);
+            }
+            catch (ArgumentException)
+            {
+
+                throw;
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                Console.WriteLine($"Error in SubmitAsync: {ex.Message}");
+                throw;
             }
-            return Guid.Empty;
         }
 
         public async Task<ResponseCompleteArrivalDTO?> GetScanAsync(Guid AppNo)
@@ -56,6 +50,7 @@ namespace MMAC.Services.ArrivalInterface
             {
                 var app = await _repository.GetArrivalApplicationDetailsAsync(AppNo);
                 if (app == null) return null;
+
                 var result = _mapper.Map<ResponseCompleteArrivalDTO>(app);
 
                 if (app.Traveller != null) _mapper.Map(app.Traveller, result);
@@ -80,8 +75,8 @@ namespace MMAC.Services.ArrivalInterface
             catch (Exception ex)
             {
                 Console.WriteLine($"Could not find or map {AppNo}. Exception: {ex.Message}");
+                throw;
             }
-            return null;
         }
     }
 }
