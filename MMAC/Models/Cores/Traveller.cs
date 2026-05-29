@@ -52,11 +52,18 @@ namespace MMAC.Models.Cores
         public string VisaNo { get; set; } = string.Empty;
 
         [MaxLength(30)]
+<<<<<<< HEAD
         public string? NRC { get; set; }
+=======
+        public string? NRC { get; set; } = string.Empty;
+>>>>>>> ca168a563634162a9c9f1d0dea368b75d7bbe611
 
-        [Required]
         [MaxLength(50)]
+<<<<<<< HEAD
         public string? FatherName { get; set; }
+=======
+        public string? FatherName { get; set; } = string.Empty;
+>>>>>>> ca168a563634162a9c9f1d0dea368b75d7bbe611
 
         [Required]
         [MaxLength(20)]

@@ -7,6 +7,7 @@ using MMAC.Profiles;
 using MMAC.Repositories;
 using MMAC.Services;
 using MMAC.Services.ArrivalInterface;
+using MMAC.Services.UtilityService;
 using MMAC.Validations;
 using Scalar.AspNetCore;
 
@@ -30,7 +31,12 @@ builder.Services.AddScoped<IPortOfArrivalService, PortOfArrivalService>();
 
 
 builder.Services.AddScoped<ICompleteArrival, CompleteArrivalService>();
+
 builder.Services.AddScoped<ICompleteArrivalRepository, CompleteArrivalRepository>();
+
+builder.Services.AddScoped<IUtilityService, UtilityService>();
+
+
 
 // AutoMapper Core Version 13 Configuration
 var mapperConfig = new MapperConfiguration(cfg =>
@@ -42,7 +48,16 @@ builder.Services.AddSingleton(mapper);
 
 builder.Services.AddValidatorsFromAssemblyContaining<CompleteArrivalDTOValidator>();
 builder.Services.AddFluentValidationAutoValidation();
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -51,8 +66,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
-
-app.UseHttpsRedirection();
+app.UseCors("AllowAll");
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
