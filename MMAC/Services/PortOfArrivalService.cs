@@ -1,25 +1,22 @@
-﻿using Microsoft.EntityFrameworkCore;
-using MMAC.Data;
-using MMAC.Models.Master;
+﻿using MMAC.Models.Master;
+using MMAC.Repositories;
 
 namespace MMAC.Services
 {
     public class PortOfArrivalService : IPortOfArrivalService
     {
-        private readonly AppDbContext _context;
+        private readonly IPortOfArrivalRepository _repository;
 
-        public PortOfArrivalService(AppDbContext context)
+        public PortOfArrivalService(IPortOfArrivalRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         public async Task<IEnumerable<PortOfArrival>> GetPortsByModeOfTravelAsync(int modeOfTravelId)
         {
             try
             {
-                return await _context.PortOfArrival
-                                     .Where(p => p.ModeOfTravelId == modeOfTravelId)
-                                     .ToListAsync();
+                return await _repository.GetPortOfArrivalAsync(modeOfTravelId);
             }
             catch (Exception ex)
             {

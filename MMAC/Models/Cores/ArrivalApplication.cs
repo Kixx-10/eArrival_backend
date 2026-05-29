@@ -58,7 +58,7 @@ namespace MMAC.Models.Cores
         public string AddressInMyanmar { get; set; } = string.Empty;
 
 
-        [Required] // မဖြစ်မနေ ဖြည့်ရမည်ဟု သတ်မှတ်ခြင်း
+        [Required]
         public int TownshipId { get; set; }
 
         [ForeignKey("TownshipId")]

@@ -15,12 +15,12 @@ namespace MMAC.Models.Master
         public string CountryCode { get; set; } = string.Empty;
 
         [Required]
-        [MaxLength(20)]
-        [Column(TypeName = "varchar(20)")]
+        [MaxLength(50)]
+        [Column(TypeName = "varchar(50)")]
         public string Name { get; set; } = string.Empty;
 
         [Required]
-        [MaxLength(30)]
+        [MaxLength(100)]
         public string NameMM { get; set; } = string.Empty;
 
         [Required]
@@ -28,7 +28,7 @@ namespace MMAC.Models.Master
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow.Date;
 
         [Column(TypeName = "date")]
-        public DateTime? UpdatedDate { get; set; }
+        public DateTime? UpdatedDate { get; set; } = DateTime.UtcNow.Date;
 
 
         public virtual ICollection<Traveller> Travellers { get; set; } = new List<Traveller>();
