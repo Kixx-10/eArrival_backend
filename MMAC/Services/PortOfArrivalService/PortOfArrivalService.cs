@@ -1,7 +1,7 @@
 ﻿using MMAC.Models.Master;
 using MMAC.Repositories;
 
-namespace MMAC.Services
+namespace MMAC.Services.PortOfArrivalService
 {
     public class PortOfArrivalService : IPortOfArrivalService
     {
