@@ -1,5 +1,5 @@
-﻿
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using MMAC.Services.PortOfArrivalService;
 
 namespace MMAC.Controllers
 {
@@ -24,9 +24,15 @@ namespace MMAC.Controllers
                 return NotFound(new { message = "No ports found for this mode of travel." });
             }
 
-
-            var result = ports.OrderBy(p => p.PortOfArrivalName)
-                .Select(p => p.PortOfArrivalName)
+            var result = ports
+                .OrderBy(p => p.PortOfArrivalName)
+                .Select(p => new
+                {
+                    PortOfArrivalId = p.PortOfArrivalId,
+                    PortOfArrivalName = p.PortOfArrivalName,
+                    ModeOfTravelId = p.ModeOfTravelId,
+                    ModeOfTravelName = p.ModeOfTravel?.ModeOfTravelName
+                })
                 .ToList();
 
             return Ok(result);

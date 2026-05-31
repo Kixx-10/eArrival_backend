@@ -1,8 +1,7 @@
 ﻿using MMAC.Models.Master;
 using MMAC.Repositories;
-using MMAC.Services.PortOfArrivalService;
 
-namespace MMAC.Services
+namespace MMAC.Services.PurposeOfVisitService
 {
     public class PurposeOfVisitService : IPurposeOfVisitService
     {

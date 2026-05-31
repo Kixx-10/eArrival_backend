@@ -1,6 +1,6 @@
 ﻿using MMAC.Models.Master;
 
-namespace MMAC.Services.PortOfArrivalService
+namespace MMAC.Services.PurposeOfVisitService
 {
     public interface IPurposeOfVisitService
     {
