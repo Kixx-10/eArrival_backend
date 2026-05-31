@@ -19,6 +19,7 @@ namespace MMAC.Repositories
             await _context.SaveChangesAsync();
             return entity;
         }
+
         public async Task<IEnumerable<PurposeOfVisit>> GetAllPurposeOfVisitsAsync()
         {
             return await _context.PurposeOfVisit.ToListAsync();

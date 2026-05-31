@@ -19,7 +19,7 @@ namespace MMAC.Models.Master
         [Required]
         public int ModeOfTravelId { get; set; }
         [ForeignKey("ModeOfTravelId")]
-        public virtual ModeOfTravel? selectedModeOfTravel { get; set; }
+        public virtual ModeOfTravel? ModeOfTravel { get; set; }
 
         [Required]
         [Column(TypeName = "date")]
