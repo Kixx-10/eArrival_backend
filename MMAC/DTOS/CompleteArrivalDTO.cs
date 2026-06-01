@@ -30,7 +30,7 @@
         public int DistrictId { get; set; }
         public int TownshipId { get; set; }
         public string MobileNumberMM { get; set; } = string.Empty;
-        public int PurposeOfVisitId { get; set; }
+        public string PurposeOfVisit { get; set; } = string.Empty;
         public string? PreviousCity { get; set; }
         public string? HealthDeclaration { get; set; }
         public string? DigitalDeclarations { get; set; }

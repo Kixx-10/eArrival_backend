@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MMAC.Migrations
 {
     /// <inheritdoc />
-    public partial class AddOtherTables : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,8 +17,8 @@ namespace MMAC.Migrations
                 columns: table => new
                 {
                     CountryISOAlpha3Code = table.Column<string>(type: "varchar(3)", maxLength: 3, nullable: false),
-                    Name = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
-                    NameMM = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    Name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
+                    NameMM = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "date", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "date", nullable: true)
                 },
@@ -40,16 +40,38 @@ namespace MMAC.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PurposeOfVisit",
+                name: "NRC_StateRegion",
                 columns: table => new
                 {
-                    PurposeOfVisitId = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    PurposeOfVisitName = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false),
+                    IdCode = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    CodeMM = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    SystemUse = table.Column<string>(type: "char(1)", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedUser = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    CreatedIPAddr = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedUser = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    UpdatedIPAddr = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PurposeOfVisit", x => x.PurposeOfVisitId);
+                    table.PrimaryKey("PK_NRC_StateRegion", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StateRegion",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false),
+                    IdCode = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    NameMM = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    SystemUse = table.Column<string>(type: "char(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StateRegion", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -65,8 +87,9 @@ namespace MMAC.Migrations
                     Email = table.Column<string>(type: "varchar(30)", maxLength: 30, nullable: false),
                     MobileNumber = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
                     Address = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    NRC = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
-                    FatherName = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    VisaNo = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    NRC = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: true),
+                    FatherName = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     PassportNo = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
                     IssuedCountryCode = table.Column<string>(type: "varchar(3)", maxLength: 3, nullable: false),
                     IssuedDate = table.Column<DateTime>(type: "date", nullable: false),
@@ -108,6 +131,55 @@ namespace MMAC.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "NRC_Township",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false),
+                    IdCode = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    CodeMM = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    NRC_SRId = table.Column<int>(type: "integer", nullable: false),
+                    SystemUse = table.Column<string>(type: "char(1)", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedUser = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    CreatedIPAddr = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedUser = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    UpdatedIPAddr = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_NRC_Township", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_NRC_Township_NRC_StateRegion_NRC_SRId",
+                        column: x => x.NRC_SRId,
+                        principalTable: "NRC_StateRegion",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "District",
+                columns: table => new
+                {
+                    DistrictId = table.Column<int>(type: "integer", nullable: false),
+                    SRId = table.Column<int>(type: "integer", nullable: false),
+                    IdCode = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    NameMM = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    SystemUse = table.Column<string>(type: "char(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_District", x => x.DistrictId);
+                    table.ForeignKey(
+                        name: "FK_District_StateRegion_SRId",
+                        column: x => x.SRId,
+                        principalTable: "StateRegion",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AuditLogs",
                 columns: table => new
                 {
@@ -131,6 +203,28 @@ namespace MMAC.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Township",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false),
+                    DistrictId = table.Column<int>(type: "integer", nullable: false),
+                    IdCode = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    NameMM = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    SystemUse = table.Column<string>(type: "char(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Township", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Township_District_DistrictId",
+                        column: x => x.DistrictId,
+                        principalTable: "District",
+                        principalColumn: "DistrictId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ArrivalApplication",
                 columns: table => new
                 {
@@ -148,7 +242,7 @@ namespace MMAC.Migrations
                     DistrictId = table.Column<int>(type: "integer", nullable: false),
                     StateRegionId = table.Column<int>(type: "integer", nullable: false),
                     MobileNumberMM = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
-                    PurposeOfVisitId = table.Column<int>(type: "integer", nullable: false),
+                    PurposeOfVisit = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     PreviousCity = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
                     HealthDeclaration = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     DigitalDeclarations = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
@@ -173,10 +267,10 @@ namespace MMAC.Migrations
                         principalColumn: "PortOfArrivalId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ArrivalApplication_PurposeOfVisit_PurposeOfVisitId",
-                        column: x => x.PurposeOfVisitId,
-                        principalTable: "PurposeOfVisit",
-                        principalColumn: "PurposeOfVisitId",
+                        name: "FK_ArrivalApplication_Township_TownshipId",
+                        column: x => x.TownshipId,
+                        principalTable: "Township",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ArrivalApplication_Traveller_TravellerId",
@@ -197,9 +291,9 @@ namespace MMAC.Migrations
                 column: "PortOfArrivalId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ArrivalApplication_PurposeOfVisitId",
+                name: "IX_ArrivalApplication_TownshipId",
                 table: "ArrivalApplication",
-                column: "PurposeOfVisitId");
+                column: "TownshipId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ArrivalApplication_TravellerId",
@@ -212,9 +306,24 @@ namespace MMAC.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_District_SRId",
+                table: "District",
+                column: "SRId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_NRC_Township_NRC_SRId",
+                table: "NRC_Township",
+                column: "NRC_SRId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PortOfArrival_ModeOfTravelId",
                 table: "PortOfArrival",
                 column: "ModeOfTravelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Township_DistrictId",
+                table: "Township",
+                column: "DistrictId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Traveller_CountryOfBirthCode",
@@ -232,19 +341,31 @@ namespace MMAC.Migrations
                 name: "AuditLogs");
 
             migrationBuilder.DropTable(
+                name: "NRC_Township");
+
+            migrationBuilder.DropTable(
                 name: "PortOfArrival");
 
             migrationBuilder.DropTable(
-                name: "PurposeOfVisit");
+                name: "Township");
 
             migrationBuilder.DropTable(
                 name: "Traveller");
 
             migrationBuilder.DropTable(
+                name: "NRC_StateRegion");
+
+            migrationBuilder.DropTable(
                 name: "ModeOfTravel");
 
             migrationBuilder.DropTable(
+                name: "District");
+
+            migrationBuilder.DropTable(
                 name: "Country");
+
+            migrationBuilder.DropTable(
+                name: "StateRegion");
         }
     }
 }

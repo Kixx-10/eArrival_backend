@@ -55,9 +55,6 @@ namespace MMAC.Validations
             RuleFor(x => x.PortOfArrivalId)
                 .GreaterThan(0).WithMessage("Please select a valid Port of Arrival.");
 
-            RuleFor(x => x.PurposeOfVisitId)
-                .GreaterThan(0).WithMessage("Please select a valid Purpose of Visit.");
-
 
             RuleFor(x => x.VehicleNumber)
                 .MaximumLength(10).WithMessage("Vehicle Number cannot exceed 10 characters.");

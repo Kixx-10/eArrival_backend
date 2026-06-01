@@ -56,8 +56,6 @@ namespace MMAC.Services.ArrivalInterface
                 if (app.Traveller != null) _mapper.Map(app.Traveller, result);
                 if (app.selectedModeOfTravel != null) result.ModeOfTravelName = app.selectedModeOfTravel.ModeOfTravelName;
                 if (app.selectedPortOfArrival != null) result.PortOfArrivalName = app.selectedPortOfArrival.PortOfArrivalName;
-                if (app.PurposeOfVisit != null) result.PurposeOfVisitName = app.PurposeOfVisit.PurposeOfVisitName;
-
                 if (app.Township != null)
                 {
                     result.TownshipName = app.Township.Name;
