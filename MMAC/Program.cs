@@ -9,7 +9,6 @@ using MMAC.Repositories;
 using MMAC.Services;
 using MMAC.Services.ArrivalInterface;
 using MMAC.Services.PortOfArrivalService;
-using MMAC.Services.PurposeOfVisitService;
 using MMAC.Services.UtilityService;
 using MMAC.Validations;
 using Scalar.AspNetCore;
@@ -26,8 +25,6 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 // Indection for service
-builder.Services.AddScoped<IPurposeOfVisitService, PurposeOfVisitService>();
-builder.Services.AddScoped<IPurposeOfVisitRepository, PurposeOfVisitRepository>();
 
 builder.Services.AddScoped<IPortOfArrivalRepository, PortOfArrivalRepository>();
 builder.Services.AddScoped<IPortOfArrivalService, PortOfArrivalService>();

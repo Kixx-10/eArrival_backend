@@ -213,8 +213,10 @@ namespace MMAC.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
-                    b.Property<int>("PurposeOfVisitId")
-                        .HasColumnType("integer");
+                    b.Property<string>("PurposeOfVisit")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("StateRegionId")
                         .HasColumnType("integer");
@@ -241,8 +243,6 @@ namespace MMAC.Migrations
                     b.HasIndex("ModeOfTravelId");
 
                     b.HasIndex("PortOfArrivalId");
-
-                    b.HasIndex("PurposeOfVisitId");
 
                     b.HasIndex("TownshipId");
 
@@ -407,24 +407,6 @@ namespace MMAC.Migrations
                     b.ToTable("PortOfArrival");
                 });
 
-            modelBuilder.Entity("MMAC.Models.Master.PurposeOfVisit", b =>
-                {
-                    b.Property<int>("PurposeOfVisitId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PurposeOfVisitId"));
-
-                    b.Property<string>("PurposeOfVisitName")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.HasKey("PurposeOfVisitId");
-
-                    b.ToTable("PurposeOfVisit");
-                });
-
             modelBuilder.Entity("MMAC.Models.NRC.NRC_StateRegion+NRCStateRegion", b =>
                 {
                     b.Property<int>("Id")
@@ -569,12 +551,6 @@ namespace MMAC.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MMAC.Models.Master.PurposeOfVisit", "PurposeOfVisit")
-                        .WithMany("ArrivalApplications")
-                        .HasForeignKey("PurposeOfVisitId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("MMAC.Models.Address.Township", "Township")
                         .WithMany("ArrivalApplications")
                         .HasForeignKey("TownshipId")
@@ -586,8 +562,6 @@ namespace MMAC.Migrations
                         .HasForeignKey("TravellerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("PurposeOfVisit");
 
                     b.Navigation("Township");
 
@@ -611,13 +585,13 @@ namespace MMAC.Migrations
 
             modelBuilder.Entity("MMAC.Models.Master.PortOfArrival", b =>
                 {
-                    b.HasOne("MMAC.Models.Master.ModeOfTravel", "selectedModeOfTravel")
+                    b.HasOne("MMAC.Models.Master.ModeOfTravel", "ModeOfTravel")
                         .WithMany("PortOfArrival")
                         .HasForeignKey("ModeOfTravelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("selectedModeOfTravel");
+                    b.Navigation("ModeOfTravel");
                 });
 
             modelBuilder.Entity("MMAC.Models.NRC.NRC_Township", b =>
@@ -666,11 +640,6 @@ namespace MMAC.Migrations
                 });
 
             modelBuilder.Entity("MMAC.Models.Master.PortOfArrival", b =>
-                {
-                    b.Navigation("ArrivalApplications");
-                });
-
-            modelBuilder.Entity("MMAC.Models.Master.PurposeOfVisit", b =>
                 {
                     b.Navigation("ArrivalApplications");
                 });

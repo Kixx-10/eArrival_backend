@@ -17,13 +17,14 @@
         public DateTime IssuedDate { get; set; }
         public DateTime ExpiryDate { get; set; }
 
-        //Arrival 
+        // Arrival Info
         public DateTime ArrivalDate { get; set; }
         public string? VehicleNumber { get; set; }
         public string? VehicleName { get; set; }
         public string? Accommodation { get; set; }
         public string AddressInMyanmar { get; set; } = string.Empty;
         public string MobileNumberMM { get; set; } = string.Empty;
+        public string PurposeOfVisit { get; set; } = string.Empty;
         public string? PreviousCity { get; set; }
         public string? HealthDeclaration { get; set; }
         public string? DigitalDeclarations { get; set; }
@@ -33,6 +34,7 @@
         public string StateRegionName { get; set; } = string.Empty;
         public string DistrictName { get; set; } = string.Empty;
         public string TownshipName { get; set; } = string.Empty;
-        public string PurposeOfVisitName { get; set; } = string.Empty;
+
+
     }
 }

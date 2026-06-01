@@ -23,7 +23,6 @@ namespace MMAC.Data
         public DbSet<Country> Country { get; set; }
         public DbSet<PortOfArrival> PortOfArrival { get; set; }
         public DbSet<ModeOfTravel> ModeOfTravel { get; set; }
-        public DbSet<PurposeOfVisit> PurposeOfVisit { get; set; }
 
         //For Address
         public DbSet<StateRegion> StateRegion { get; set; }

@@ -72,10 +72,9 @@ namespace MMAC.Models.Cores
         [Column(TypeName = "varchar(20)")]
         public string MobileNumberMM { get; set; } = string.Empty;
 
+        [MaxLength(100)]
         [Required]
-        public int PurposeOfVisitId { get; set; }
-        [ForeignKey("PurposeOfVisitId")]
-        public virtual PurposeOfVisit? PurposeOfVisit { get; set; }
+        public string PurposeOfVisit { get; set; } = string.Empty;
 
         [MaxLength(20)]
         public string? PreviousCity { get; set; }

@@ -40,10 +40,8 @@ namespace MMAC.Repositories
 
         public async Task<ArrivalApplication?> GetArrivalApplicationDetailsAsync(Guid appNo)
         {
-            // only take data from database
             return await _context.ArrivalApplication
                 .Include(x => x.Traveller)
-                .Include(x => x.PurposeOfVisit)
                 .Include(x => x.selectedModeOfTravel)
                 .Include(x => x.selectedPortOfArrival)
                 .Include(x => x.Township)
