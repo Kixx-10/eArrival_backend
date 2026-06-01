@@ -3,8 +3,10 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using MMAC.Data;
+using MMAC.Interfaces;
 using MMAC.Profiles;
 using MMAC.Repositories;
+using MMAC.Services;
 using MMAC.Services.ArrivalInterface;
 using MMAC.Services.PortOfArrivalService;
 using MMAC.Services.PurposeOfVisitService;
@@ -36,6 +38,8 @@ builder.Services.AddScoped<ICompleteArrival, CompleteArrivalService>();
 builder.Services.AddScoped<ICompleteArrivalRepository, CompleteArrivalRepository>();
 
 builder.Services.AddScoped<IUtilityService, UtilityService>();
+
+builder.Services.AddScoped<ICountryService, CountryService>();
 
 
 
