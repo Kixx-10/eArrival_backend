@@ -47,9 +47,8 @@ namespace MMAC.Models.Cores
         [MaxLength(100)]
         public string Address { get; set; } = string.Empty;
 
-        [Required]
         [MaxLength(50)]
-        public string VisaNo { get; set; } = string.Empty;
+        public string? VisaNo { get; set; } = string.Empty;
 
         [MaxLength(30)]
         public string? NRC { get; set; }
