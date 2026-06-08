@@ -41,17 +41,19 @@ namespace MMAC.Models.Cores
         [ForeignKey("PortOfArrivalId")]
         public virtual PortOfArrival? selectedPortOfArrival { get; set; }
 
+        [Required]
         [MaxLength(10)]
         [Column(TypeName = "varchar(10)")]
-        public string? VehicleNumber { get; set; }
+        public string VehicleNumber { get; set; } = string.Empty;
 
+        [Required]
         [MaxLength(20)]
         [Column(TypeName = "varchar(20)")]
-        public string? VehicleName { get; set; }
+        public string VehicleName { get; set; } = string.Empty;
 
-
+        [Required]
         [MaxLength(20)]
-        public string? Accommodation { get; set; }
+        public string Accommodation { get; set; } = string.Empty;
 
         [Required]
         [MaxLength(100)]
@@ -76,15 +78,17 @@ namespace MMAC.Models.Cores
         [Required]
         public string PurposeOfVisit { get; set; } = string.Empty;
 
+        [Required]
         [MaxLength(20)]
-        public string? PreviousCity { get; set; }
+        public string PreviousCity { get; set; } = string.Empty;
 
-
+        [Required]
         [MaxLength(100)]
-        public string? HealthDeclaration { get; set; }
+        public string HealthDeclaration { get; set; } = string.Empty;
 
+        [Required]
         [MaxLength(100)]
-        public string? DigitalDeclarations { get; set; }
+        public string DigitalDeclarations { get; set; } = string.Empty;
 
 
         public DateTime? ApprovedDate { get; set; }
