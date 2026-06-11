@@ -13,6 +13,11 @@ namespace MMAC.Models.Cores
         public Guid AppNo { get; set; } = Guid.NewGuid();
 
         [Required]
+        [MaxLength(20)]
+        [Column(TypeName = "varchar(20)")]
+        public string ReferenceNo { get; set; } = string.Empty;
+
+        [Required]
         public Guid TravellerId { get; set; }
 
         [ForeignKey("TravellerId")]
@@ -22,7 +27,7 @@ namespace MMAC.Models.Cores
         [Required]
         [MaxLength(10)]
         [Column(TypeName = "varchar(10)")]
-        public string AppStatus { get; set; } = "Pending";
+        public string AppStatus { get; set; } = "Active";
 
         [Required]
         [Column(TypeName = "date")]
