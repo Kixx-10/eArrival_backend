@@ -18,10 +18,39 @@ namespace MMAC.Repositories
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                traveller.TravellerId = Guid.NewGuid();
-                await _context.Traveller.AddAsync(traveller);
+                bool isTravellerExist = false;
+                if (traveller.TravellerId != Guid.Empty)
+                {
+                    isTravellerExist = await _context.Traveller.AnyAsync(t => t.TravellerId == traveller.TravellerId);
+                }
 
-                application.AppNo = Guid.NewGuid();
+                // Traveller create or update 
+                if (traveller.TravellerId == Guid.Empty || !isTravellerExist)
+                {
+                    if (traveller.TravellerId == Guid.Empty)
+                    {
+                        traveller.TravellerId = Guid.NewGuid();
+                    }
+                    await _context.Traveller.AddAsync(traveller);
+                }
+                else
+                {
+                    // if real has database to update
+                    _context.Traveller.Update(traveller);
+                }
+
+                if (!string.IsNullOrEmpty(application.ReferenceNo))
+                {
+                    var previousActiveApps = await _context.ArrivalApplication
+                        .Where(a => a.ReferenceNo == application.ReferenceNo && a.AppStatus == "Acitve")
+                        .ToListAsync();
+
+                    foreach (var oldApp in previousActiveApps)
+                    {
+                        oldApp.AppStatus = "Invalid";
+                        oldApp.UpdatedDate = DateTime.UtcNow.Date;
+                    }
+                }
                 application.TravellerId = traveller.TravellerId;
                 await _context.ArrivalApplication.AddAsync(application);
 
@@ -48,6 +77,10 @@ namespace MMAC.Repositories
                     .ThenInclude(t => t!.District)
                         .ThenInclude(d => d!.StateRegion)
                 .FirstOrDefaultAsync(a => a.AppNo == appNo);
+        }
+        public async Task<bool> IsReferenceNoExistsAsync(string referenceNo)
+        {
+            return await _context.ArrivalApplication.AnyAsync(a => a.ReferenceNo == referenceNo);
         }
     }
 }
