@@ -34,7 +34,6 @@ namespace MMAC.Services.ArrivalInterface
             }
             catch (ArgumentException)
             {
-
                 throw;
             }
             catch (Exception ex)

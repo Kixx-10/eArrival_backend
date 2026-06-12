@@ -51,5 +51,6 @@ namespace MMAC.Controllers
 
             return Ok(applicationDetails);
         }
+
     }
 }
