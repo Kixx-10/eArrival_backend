@@ -27,7 +27,7 @@ namespace MMAC.Models.Cores
         [Required]
         [MaxLength(10)]
         [Column(TypeName = "varchar(10)")]
-        public string AppStatus { get; set; } = "Active";
+        public string? AppStatus { get; set; }
 
         [Required]
         [Column(TypeName = "date")]

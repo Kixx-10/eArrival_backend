@@ -20,7 +20,7 @@ namespace MMAC.Services.ArrivalInterface
         {
             try
             {
-                // Validate Myanmar Citizen
+                // ၁။ Validate Myanmar Citizen
                 if (dto.CountryOfBirthCode == "MMR")
                 {
                     if (string.IsNullOrWhiteSpace(dto.NRC) || string.IsNullOrWhiteSpace(dto.FatherName))
@@ -29,43 +29,27 @@ namespace MMAC.Services.ArrivalInterface
                     }
                 }
 
-                // ၂။ AutoMapper Mapping (DTO to Entity)
+                // ၂။ AutoMapper Mapping
                 var traveller = _mapper.Map<Traveller>(dto);
                 var arrivalApplication = _mapper.Map<ArrivalApplication>(dto);
 
-                //  Business Logic for ReferenceNo
-                if (!string.IsNullOrEmpty(dto.ReferenceNo))
+                //  New Application 
+                string currentYear = DateTime.Now.Year.ToString();
+                string finalReferenceNo = string.Empty;
+                bool isDuplicate = true;
+
+                while (isDuplicate)
                 {
-                    // If user updates, re-use old ReferenceNo
-                    arrivalApplication.ReferenceNo = dto.ReferenceNo;
+                    int randomNumber = Random.Shared.Next(10000000, 99999999);
+                    finalReferenceNo = $"MMR-{currentYear}-{randomNumber}";
+                    isDuplicate = await _repository.IsReferenceNoExistsAsync(finalReferenceNo);
                 }
-                else
-                {
-                    // If new user, generate a unique ReferenceNo (MMR-YYYY-XXXXXXXX)
-                    string currentYear = DateTime.Now.Year.ToString();
-                    string finalReferenceNo = string.Empty;
-                    bool isDuplicate = true;
-
-                    while (isDuplicate)
-                    {
-                        int randomNumber = Random.Shared.Next(10000000, 99999999);
-                        finalReferenceNo = $"MMR-{currentYear}-{randomNumber}";
-
-                        // Check uniqueness against database via repository
-                        isDuplicate = await _repository.IsReferenceNoExistsAsync(finalReferenceNo);
-                    }
-
-                    arrivalApplication.ReferenceNo = finalReferenceNo;
-                }
-
-                //  Generate New Guid for QR Code and set status
+                arrivalApplication.ReferenceNo = finalReferenceNo;
                 arrivalApplication.AppNo = Guid.NewGuid();
                 arrivalApplication.AppStatus = "Active";
 
-                //  Save to database via Repository (Returns the saved AppNo Guid)
                 Guid savedAppNo = await _repository.SubmitArrivalApplicationAsync(traveller, arrivalApplication);
 
-                //  Return both ApplicationNo and ReferenceNo wrapped in DTO
                 return new ArrivalSubmitResponseDTO
                 {
                     ApplicationNo = savedAppNo,
@@ -89,13 +73,6 @@ namespace MMAC.Services.ArrivalInterface
             {
                 var app = await _repository.GetArrivalApplicationDetailsAsync(AppNo);
                 if (app == null) return null;
-
-                // if old qr invalid
-                if (app.AppStatus == "Invalid")
-                {
-                    throw new InvalidOperationException("This QR Code is invalid because the application has been updated with a new version.");
-                }
-
                 var result = _mapper.Map<ResponseCompleteArrivalDTO>(app);
 
                 if (app.Traveller != null) _mapper.Map(app.Traveller, result);
@@ -115,10 +92,6 @@ namespace MMAC.Services.ArrivalInterface
                     }
                 }
                 return result;
-            }
-            catch (InvalidOperationException)
-            {
-                throw;
             }
             catch (Exception ex)
             {

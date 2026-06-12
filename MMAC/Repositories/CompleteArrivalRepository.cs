@@ -18,39 +18,14 @@ namespace MMAC.Repositories
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                bool isTravellerExist = false;
-                if (traveller.TravellerId != Guid.Empty)
+                //if new user generate id
+                if (traveller.TravellerId == Guid.Empty)
                 {
-                    isTravellerExist = await _context.Traveller.AnyAsync(t => t.TravellerId == traveller.TravellerId);
+                    traveller.TravellerId = Guid.NewGuid();
                 }
+                await _context.Traveller.AddAsync(traveller);
 
-                // Traveller create or update 
-                if (traveller.TravellerId == Guid.Empty || !isTravellerExist)
-                {
-                    if (traveller.TravellerId == Guid.Empty)
-                    {
-                        traveller.TravellerId = Guid.NewGuid();
-                    }
-                    await _context.Traveller.AddAsync(traveller);
-                }
-                else
-                {
-                    // if real has database to update
-                    _context.Traveller.Update(traveller);
-                }
-
-                if (!string.IsNullOrEmpty(application.ReferenceNo))
-                {
-                    var previousActiveApps = await _context.ArrivalApplication
-                        .Where(a => a.ReferenceNo == application.ReferenceNo && a.AppStatus == "Acitve")
-                        .ToListAsync();
-
-                    foreach (var oldApp in previousActiveApps)
-                    {
-                        oldApp.AppStatus = "Invalid";
-                        oldApp.UpdatedDate = DateTime.UtcNow.Date;
-                    }
-                }
+                //foreign key traveller id ==traveller.id
                 application.TravellerId = traveller.TravellerId;
                 await _context.ArrivalApplication.AddAsync(application);
 
@@ -62,7 +37,7 @@ namespace MMAC.Repositories
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                Console.WriteLine(ex.ToString());
+                Console.WriteLine($"[DB ERROR]: {ex.ToString()}");
                 return Guid.Empty;
             }
         }
@@ -78,6 +53,7 @@ namespace MMAC.Repositories
                         .ThenInclude(d => d!.StateRegion)
                 .FirstOrDefaultAsync(a => a.AppNo == appNo);
         }
+
         public async Task<bool> IsReferenceNoExistsAsync(string referenceNo)
         {
             return await _context.ArrivalApplication.AnyAsync(a => a.ReferenceNo == referenceNo);
