@@ -42,6 +42,19 @@ namespace MMAC.Repositories
             }
         }
 
+        //validate 24 hr 
+        public async Task<bool> IsDuplicateSubmissionWithin24HoursAsync(string fullName, string passportNo, string issuedCountryCode, DateTime dob)
+        {
+            var twentyFourHoursAgo = DateTime.UtcNow.AddHours(-24);
+
+            return await _context.Traveller
+                .AnyAsync(t => t.FullName.ToLower() == fullName.ToLower()
+                            && t.PassportNo.ToLower() == passportNo.ToLower()
+                            && t.IssuedCountryCode.ToLower() == issuedCountryCode.ToLower()
+                            && t.DOB.Date == dob.Date
+                            && t.ArrivalApplications.Any(a => a.CreatedDate >= twentyFourHoursAgo));
+        }
+
         public async Task<ArrivalApplication?> GetArrivalApplicationDetailsAsync(Guid appNo)
         {
             return await _context.ArrivalApplication

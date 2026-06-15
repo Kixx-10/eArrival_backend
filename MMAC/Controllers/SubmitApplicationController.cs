@@ -21,42 +21,36 @@ namespace MMAC.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
-                //}
-                //if (!ModelState.IsValid)
-                //{
-                //    Console.WriteLine("======= [API MODEL STATE ERROR] =======");
-                //    foreach (var modelState in ModelState)
-                //    {
-                //        var propertyName = modelState.Key;
-                //        var errors = modelState.Value.Errors;
-
-                //        foreach (var error in errors)
-                //        {
-                //            Console.WriteLine($"Field: {propertyName} -> Error: {error.ErrorMessage}");
-                //            if (error.Exception != null)
-                //            {
-                //                Console.WriteLine($"Exception: {error.Exception.Message}");
-                //            }
-                //        }
-                //    }
-                Console.WriteLine("=======================================");
-
-                return BadRequest(ModelState);
             }
 
-            var result = await _completeArrival.SubmitAsync(model);
-
-            if (result.ApplicationNo == Guid.Empty)
+            try
             {
-                return BadRequest(new { message = "Failed to Submit ArrivalApplication" });
+                var result = await _completeArrival.SubmitAsync(model);
+
+                if (result.ApplicationNo == Guid.Empty)
+                {
+                    return BadRequest(new { message = "Failed to Submit ArrivalApplication" });
+                }
+
+                return Ok(new
+                {
+                    message = "Application submitted successfully",
+                    applicationNo = result.ApplicationNo,
+                    referenceNo = result.ReferenceNo,
+                });
             }
-
-            return Ok(new
+            catch (InvalidOperationException ex)
             {
-                message = "Application submitted successfully",
-                applicationNo = result.ApplicationNo,
-                referenceNo = result.ReferenceNo,
-            });
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "An internal server error occurred." });
+            }
         }
 
 

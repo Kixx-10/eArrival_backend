@@ -20,7 +20,7 @@ namespace MMAC.Services.ArrivalInterface
         {
             try
             {
-                // ၁။ Validate Myanmar Citizen
+                // Validate Myanmar Citizen
                 if (dto.CountryOfBirthCode == "MMR")
                 {
                     if (string.IsNullOrWhiteSpace(dto.NRC) || string.IsNullOrWhiteSpace(dto.FatherName))
@@ -28,7 +28,19 @@ namespace MMAC.Services.ArrivalInterface
                         throw new ArgumentException("Need NRC and FatherName for Myanmar Citizens");
                     }
                 }
+                //validate  from repository 
+                bool isDuplicateApplication = await _repository.IsDuplicateSubmissionWithin24HoursAsync(
+                    dto.FullName,
+                    dto.PassportNo,
+                    dto.IssuedCountryCode,
+                    dto.DOB
+                );
 
+                if (isDuplicateApplication)
+                {
+                    // Controller BadRequest(ex.Message) 
+                    throw new InvalidOperationException("You have already submitted an application within the last 24 hours. Please try again after 24 hours.");
+                }
                 // ၂။ AutoMapper Mapping
                 var traveller = _mapper.Map<Traveller>(dto);
                 var arrivalApplication = _mapper.Map<ArrivalApplication>(dto);
@@ -46,7 +58,7 @@ namespace MMAC.Services.ArrivalInterface
                 }
                 arrivalApplication.ReferenceNo = finalReferenceNo;
                 arrivalApplication.AppNo = Guid.NewGuid();
-                arrivalApplication.AppStatus = "Active";
+                arrivalApplication.AppStatus = "Submitted";
 
                 Guid savedAppNo = await _repository.SubmitArrivalApplicationAsync(traveller, arrivalApplication);
 
