@@ -8,10 +8,12 @@ using MMAC.Profiles;
 using MMAC.Repositories;
 using MMAC.Services;
 using MMAC.Services.ArrivalInterface;
+using MMAC.Services.PdfService;
 using MMAC.Services.PortOfArrivalService;
 using MMAC.Services.UtilityService;
 using MMAC.Validations;
 using Scalar.AspNetCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +39,12 @@ builder.Services.AddScoped<ICompleteArrivalRepository, CompleteArrivalRepository
 builder.Services.AddScoped<IUtilityService, UtilityService>();
 
 builder.Services.AddScoped<ICountryService, CountryService>();
+
+builder.Services.AddScoped<IPdfService, PdfService>();
+
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 
 
@@ -65,8 +73,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    app.MapScalarApiReference();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 app.UseCors("AllowAll");
 //app.UseHttpsRedirection();
