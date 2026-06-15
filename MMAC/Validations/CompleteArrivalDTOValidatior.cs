@@ -84,7 +84,6 @@ namespace MMAC.Validations
             RuleFor(x => x.StateRegionId).GreaterThan(0).WithMessage("State or Region Selection is required.");
 
             RuleFor(x => x.MobileNumberMM)
-                .NotEmpty().WithMessage("Myanmar Mobile Number is required.")
                 .MaximumLength(20).WithMessage("Myanmar Mobile Number cannot exceed 20 characters.");
 
             RuleFor(x => x.PreviousCity)
