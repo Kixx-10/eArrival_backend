@@ -21,10 +21,32 @@ namespace MMAC.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
-            }
-            var AppNo = await _completeArrival.SubmitAsync(model);
+                //}
+                //if (!ModelState.IsValid)
+                //{
+                //    Console.WriteLine("======= [API MODEL STATE ERROR] =======");
+                //    foreach (var modelState in ModelState)
+                //    {
+                //        var propertyName = modelState.Key;
+                //        var errors = modelState.Value.Errors;
 
-            if (AppNo == Guid.Empty)
+                //        foreach (var error in errors)
+                //        {
+                //            Console.WriteLine($"Field: {propertyName} -> Error: {error.ErrorMessage}");
+                //            if (error.Exception != null)
+                //            {
+                //                Console.WriteLine($"Exception: {error.Exception.Message}");
+                //            }
+                //        }
+                //    }
+                Console.WriteLine("=======================================");
+
+                return BadRequest(ModelState);
+            }
+
+            var result = await _completeArrival.SubmitAsync(model);
+
+            if (result.ApplicationNo == Guid.Empty)
             {
                 return BadRequest(new { message = "Failed to Submit ArrivalApplication" });
             }
@@ -32,8 +54,8 @@ namespace MMAC.Controllers
             return Ok(new
             {
                 message = "Application submitted successfully",
-                ApplicationNo = AppNo,
-                qrCodeContent = AppNo.ToString()
+                applicationNo = result.ApplicationNo,
+                referenceNo = result.ReferenceNo,
             });
         }
 
@@ -41,15 +63,31 @@ namespace MMAC.Controllers
         [HttpGet("{AppNo}")]
         public async Task<IActionResult> GetDetails(Guid AppNo)
         {
-            var applicationDetails = await _completeArrival.GetScanAsync(AppNo);
-
-            if (applicationDetails == null)
+            try
             {
-                return NotFound(new { message = "Application not found or Invalid QR Code!" });
+                var applicationDetails = await _completeArrival.GetScanAsync(AppNo);
+
+                if (applicationDetails == null)
+                {
+                    return NotFound(new { message = "Application not found or Invalid QR Code!" });
+                }
+
+
+                return Ok(applicationDetails);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new
+                {
+                    status = "Invalid",
+                    message = ex.Message
+                });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "An internal error occurred." });
             }
 
-
-            return Ok(applicationDetails);
         }
 
     }

@@ -18,10 +18,14 @@ namespace MMAC.Repositories
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                traveller.TravellerId = Guid.NewGuid();
+                //if new user generate id
+                if (traveller.TravellerId == Guid.Empty)
+                {
+                    traveller.TravellerId = Guid.NewGuid();
+                }
                 await _context.Traveller.AddAsync(traveller);
 
-                application.AppNo = Guid.NewGuid();
+                //foreign key traveller id ==traveller.id
                 application.TravellerId = traveller.TravellerId;
                 await _context.ArrivalApplication.AddAsync(application);
 
@@ -33,7 +37,7 @@ namespace MMAC.Repositories
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                Console.WriteLine(ex.ToString());
+                Console.WriteLine($"[DB ERROR]: {ex.ToString()}");
                 return Guid.Empty;
             }
         }
@@ -48,6 +52,11 @@ namespace MMAC.Repositories
                     .ThenInclude(t => t!.District)
                         .ThenInclude(d => d!.StateRegion)
                 .FirstOrDefaultAsync(a => a.AppNo == appNo);
+        }
+
+        public async Task<bool> IsReferenceNoExistsAsync(string referenceNo)
+        {
+            return await _context.ArrivalApplication.AnyAsync(a => a.ReferenceNo == referenceNo);
         }
     }
 }

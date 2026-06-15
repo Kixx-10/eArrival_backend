@@ -16,10 +16,11 @@ namespace MMAC.Services.ArrivalInterface
             _mapper = mapper;
         }
 
-        public async Task<Guid> SubmitAsync(CompleteArrivalDTO dto)
+        public async Task<ArrivalSubmitResponseDTO> SubmitAsync(CompleteArrivalDTO dto)
         {
             try
             {
+                // ၁။ Validate Myanmar Citizen
                 if (dto.CountryOfBirthCode == "MMR")
                 {
                     if (string.IsNullOrWhiteSpace(dto.NRC) || string.IsNullOrWhiteSpace(dto.FatherName))
@@ -28,9 +29,32 @@ namespace MMAC.Services.ArrivalInterface
                     }
                 }
 
+                // ၂။ AutoMapper Mapping
                 var traveller = _mapper.Map<Traveller>(dto);
                 var arrivalApplication = _mapper.Map<ArrivalApplication>(dto);
-                return await _repository.SubmitArrivalApplicationAsync(traveller, arrivalApplication);
+
+                //  New Application 
+                string currentYear = DateTime.Now.Year.ToString();
+                string finalReferenceNo = string.Empty;
+                bool isDuplicate = true;
+
+                while (isDuplicate)
+                {
+                    int randomNumber = Random.Shared.Next(10000000, 99999999);
+                    finalReferenceNo = $"MMR-{currentYear}-{randomNumber}";
+                    isDuplicate = await _repository.IsReferenceNoExistsAsync(finalReferenceNo);
+                }
+                arrivalApplication.ReferenceNo = finalReferenceNo;
+                arrivalApplication.AppNo = Guid.NewGuid();
+                arrivalApplication.AppStatus = "Active";
+
+                Guid savedAppNo = await _repository.SubmitArrivalApplicationAsync(traveller, arrivalApplication);
+
+                return new ArrivalSubmitResponseDTO
+                {
+                    ApplicationNo = savedAppNo,
+                    ReferenceNo = arrivalApplication.ReferenceNo
+                };
             }
             catch (ArgumentException)
             {
@@ -49,12 +73,12 @@ namespace MMAC.Services.ArrivalInterface
             {
                 var app = await _repository.GetArrivalApplicationDetailsAsync(AppNo);
                 if (app == null) return null;
-
                 var result = _mapper.Map<ResponseCompleteArrivalDTO>(app);
 
                 if (app.Traveller != null) _mapper.Map(app.Traveller, result);
                 if (app.selectedModeOfTravel != null) result.ModeOfTravelName = app.selectedModeOfTravel.ModeOfTravelName;
                 if (app.selectedPortOfArrival != null) result.PortOfArrivalName = app.selectedPortOfArrival.PortOfArrivalName;
+
                 if (app.Township != null)
                 {
                     result.TownshipName = app.Township.Name;
