@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MMAC.DTOS;
 using MMAC.Services.ArrivalInterface;
+using MMAC.Services.PdfService;
 
 namespace MMAC.Controllers
 {
@@ -10,11 +11,14 @@ namespace MMAC.Controllers
     public class SubmitApplicationController : ControllerBase
     {
         private readonly ICompleteArrival _completeArrival;
+        private readonly IPdfService _pdfService;
 
-        public SubmitApplicationController(ICompleteArrival completeArrival)
+        public SubmitApplicationController(ICompleteArrival completeArrival, IPdfService pdfService)
         {
             _completeArrival = completeArrival;
+            _pdfService = pdfService;
         }
+
         [HttpPost]
         public async Task<IActionResult> Submit([FromBody] CompleteArrivalDTO model)
         {
@@ -32,11 +36,21 @@ namespace MMAC.Controllers
                     return BadRequest(new { message = "Failed to Submit ArrivalApplication" });
                 }
 
+                byte[] pdfBytes = await _pdfService.GenerateArrivalPdfAsync(model, result.ApplicationNo, result.ReferenceNo);
+
+                if (!string.IsNullOrEmpty(model.Email))
+                {
+                    _pdfService.SendPdfEmailInBackground(model.Email, result.ApplicationNo.ToString(), pdfBytes);
+                }
+
+                string pdfBase64 = Convert.ToBase64String(pdfBytes);
+
                 return Ok(new
                 {
                     message = "Application submitted successfully",
-                    applicationNo = result.ApplicationNo,
-                    referenceNo = result.ReferenceNo,
+                    applicationNo = result.ApplicationNo.ToString(),
+                    referenceNo = result.ReferenceNo ?? "N/A",
+                    pdfData = pdfBase64 
                 });
             }
             catch (InvalidOperationException ex)
@@ -47,12 +61,11 @@ namespace MMAC.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An internal server error occurred." });
+                return StatusCode(500, new { message = "An error occurred during submission or PDF processing.", error = ex.Message });
             }
         }
-
 
         [HttpGet("{AppNo}")]
         public async Task<IActionResult> GetDetails(Guid AppNo)
