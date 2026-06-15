@@ -6,6 +6,7 @@ namespace MMAC.Repositories
     {
         // repository accept entity model ,no accept DTO
         Task<Guid> SubmitArrivalApplicationAsync(Traveller traveller, ArrivalApplication application);
+        Task<bool> IsDuplicateSubmissionWithin24HoursAsync(string fullName, string passportNo, string countryOfBirthCode, DateTime dob);
         Task<ArrivalApplication?> GetArrivalApplicationDetailsAsync(Guid appNo);
         Task<bool> IsReferenceNoExistsAsync(string referenceNo);
     }

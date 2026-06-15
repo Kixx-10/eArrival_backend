@@ -28,13 +28,12 @@
 
         public string VehicleNumber { get; set; } = string.Empty;
         public string VehicleName { get; set; } = string.Empty;
-        public string Accommodation { get; set; } = string.Empty;
-
+        public string? Accommodation { get; set; }
         public string AddressInMyanmar { get; set; } = string.Empty;
         public int StateRegionId { get; set; }
         public int DistrictId { get; set; }
         public int TownshipId { get; set; }
-        public string MobileNumberMM { get; set; } = string.Empty;
+        public string? MobileNumberMM { get; set; }
         public string PurposeOfVisit { get; set; } = string.Empty;
         public string PreviousCity { get; set; } = string.Empty;
         public string HealthDeclaration { get; set; } = string.Empty;
