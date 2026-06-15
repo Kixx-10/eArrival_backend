@@ -56,9 +56,8 @@ namespace MMAC.Models.Cores
         [Column(TypeName = "varchar(20)")]
         public string VehicleName { get; set; } = string.Empty;
 
-        [Required]
-        [MaxLength(20)]
-        public string Accommodation { get; set; } = string.Empty;
+        [MaxLength(100)]
+        public string? Accommodation { get; set; }
 
         [Required]
         [MaxLength(100)]
@@ -74,10 +73,9 @@ namespace MMAC.Models.Cores
         public int StateRegionId { get; set; }
 
 
-        [Required]
         [MaxLength(20)]
         [Column(TypeName = "varchar(20)")]
-        public string MobileNumberMM { get; set; } = string.Empty;
+        public string? MobileNumberMM { get; set; }
 
         [MaxLength(100)]
         [Required]
@@ -94,7 +92,6 @@ namespace MMAC.Models.Cores
         [Required]
         [MaxLength(100)]
         public string DigitalDeclarations { get; set; } = string.Empty;
-
 
         public DateTime? ApprovedDate { get; set; }
 
