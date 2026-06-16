@@ -9,6 +9,7 @@ using MMAC.Repositories;
 using MMAC.Services;
 using MMAC.Services.ArrivalInterface;
 using MMAC.Services.PortOfArrivalService;
+using MMAC.Services.UpdateService;
 using MMAC.Services.UtilityService;
 using MMAC.Validations;
 using Scalar.AspNetCore;
@@ -29,6 +30,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddScoped<IPortOfArrivalRepository, PortOfArrivalRepository>();
 builder.Services.AddScoped<IPortOfArrivalService, PortOfArrivalService>();
 
+builder.Services.AddScoped<IForeignerSearchService, ForeignerSearchService>();
 
 builder.Services.AddScoped<ICompleteArrival, CompleteArrivalService>();
 
