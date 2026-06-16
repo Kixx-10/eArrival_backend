@@ -3,20 +3,20 @@ using Microsoft.EntityFrameworkCore;
 using MMAC.Data;
 using MMAC.DTOS;
 
-namespace MMAC.Services.UpdateService
+namespace MMAC.Services.SearchService
 {
-    public class ForeignerSearchService : IForeignerSearchService
+    public class MyanmarSearchService : IMyanmarSearchService
     {
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
 
-        public ForeignerSearchService(AppDbContext context, IMapper mapper)
+        public MyanmarSearchService(AppDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
-        public async Task<ResponseForeignerArrivalDTO> SearchForeignerDetailsAsync(ForeignerVerifyRequestDTO dto)
+        public async Task<ResponseMyanmarArrivalDTO> SearchMyanmarDetailsAsync(MyanmarVerifyRequestDTO dto)
         {
             var app = await _context.ArrivalApplication
                 .Include(a => a.Traveller)
@@ -27,20 +27,22 @@ namespace MMAC.Services.UpdateService
                 .FirstOrDefaultAsync(a => a.ReferenceNo.ToLower() == dto.ReferenceNo.ToLower()
                                        && a.AppStatus == "Submitted");
 
+
             if (app == null || app.Traveller == null)
             {
-                throw new KeyNotFoundException("The provided verification details do not match any registered foreign national records.");
+                throw new KeyNotFoundException("The provided verification details do not match any registered Myanmar citizen records.");
             }
 
-            bool isIdentityMatched = app.Traveller.PassportNo.ToLower() == dto.PassportNo.ToLower()
-                                  && app.Traveller.CountryOfBirthCode.ToLower() == dto.CountryOfBirthCode.ToLower()
-                                  && app.Traveller.ExpiryDate.Date == dto.ExpiryDate.Date
-                                  && app.Traveller.DOB.Date == dto.DOB.Date;
+
+            bool isIdentityMatched = app.Traveller.NRC != null
+                                  && app.Traveller.NRC.ToLower() == dto.NRC.ToLower()
+                                  && app.ArrivalDate.Date == dto.ArrivalDate.Date;
 
             if (!isIdentityMatched)
             {
-                throw new KeyNotFoundException("The provided verification details do not match any registered foreign national records.");
+                throw new KeyNotFoundException("The provided verification details do not match any registered Myanmar citizen records.");
             }
+
 
             if (app.Township != null)
             {
@@ -52,8 +54,9 @@ namespace MMAC.Services.UpdateService
             }
 
 
-            var result = _mapper.Map<ResponseForeignerArrivalDTO>(app);
+            var result = _mapper.Map<ResponseMyanmarArrivalDTO>(app);
             _mapper.Map(app.Traveller, result);
+
 
             if (app.selectedModeOfTravel != null) result.ModeOfTravelName = app.selectedModeOfTravel.ModeOfTravelName;
             if (app.selectedPortOfArrival != null) result.PortOfArrivalName = app.selectedPortOfArrival.PortOfArrivalName;

@@ -14,6 +14,8 @@ namespace MMAC.Profiles
             CreateMap<ResponseCompleteArrivalDTO, ArrivalApplication>().ReverseMap();
             CreateMap<ArrivalApplication, ResponseForeignerArrivalDTO>();
             CreateMap<Traveller, ResponseForeignerArrivalDTO>();
+            CreateMap<ArrivalApplication, ResponseMyanmarArrivalDTO>();
+            CreateMap<Traveller, ResponseMyanmarArrivalDTO>();
         }
     }
 }
