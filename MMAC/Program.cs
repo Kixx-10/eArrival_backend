@@ -10,9 +10,10 @@ using MMAC.Services;
 using MMAC.Services.ArrivalInterface;
 using MMAC.Services.PdfService;
 using MMAC.Services.PortOfArrivalService;
+using MMAC.Services.SearchService;
+using MMAC.Services.UpdateService;
 using MMAC.Services.UtilityService;
 using MMAC.Validations;
-using Scalar.AspNetCore;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +32,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddScoped<IPortOfArrivalRepository, PortOfArrivalRepository>();
 builder.Services.AddScoped<IPortOfArrivalService, PortOfArrivalService>();
 
+builder.Services.AddScoped<IForeignerSearchService, ForeignerSearchService>();
+builder.Services.AddScoped<IMyanmarSearchService, MyanmarSearchService>();
 
 builder.Services.AddScoped<ICompleteArrival, CompleteArrivalService>();
 
@@ -75,6 +78,8 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    //app.MapOpenApi();
+    //app.MapScalarApiReference();
 }
 app.UseCors("AllowAll");
 //app.UseHttpsRedirection();
