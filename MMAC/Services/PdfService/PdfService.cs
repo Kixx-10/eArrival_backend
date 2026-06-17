@@ -11,12 +11,20 @@ using System.IO;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 
 namespace MMAC.Services.PdfService
 {
     public class PdfService: IPdfService
     {
+        private readonly IConfiguration _configuration;
+
+        public PdfService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         public async Task<byte[]> GenerateArrivalPdfAsync(CompleteArrivalDTO model, Guid applicationNo, string referenceNo)
         {
             return await Task.Run(() =>
@@ -121,14 +129,16 @@ namespace MMAC.Services.PdfService
         public void SendPdfEmailInBackground(string toEmail, string applicationId, byte[] pdfBytes)
         {
             if (string.IsNullOrEmpty(toEmail)) return;
+            string senderEmail = _configuration["EmailSettings:SenderEmail"]!;
+            string senderName = _configuration["EmailSettings:SenderName"]!;
+            string appPassword = _configuration["EmailSettings:AppPassword"]!;
 
             Task.Run(async () =>
             {
                 try
                 {
-                    var fromAddress = new MailAddress("your-email@gmail.com", "MMAC Arrival System");
+                    var fromAddress = new MailAddress(senderEmail, senderName);
                     var toAddress = new MailAddress(toEmail);
-                    const string fromPassword = "your-app-password";
                     const string subject = "Your Arrival Form Registration Success";
                     const string body = "Dear Applicant,\n\nYour application has been submitted successfully. Please find your Arrival Form PDF attached below.";
 
@@ -139,7 +149,7 @@ namespace MMAC.Services.PdfService
                         EnableSsl = true,
                         DeliveryMethod = SmtpDeliveryMethod.Network,
                         UseDefaultCredentials = false,
-                        Credentials = new NetworkCredential(fromAddress.Address, fromPassword)
+                        Credentials = new NetworkCredential(fromAddress.Address, appPassword)
                     };
 
                     using var message = new MailMessage(fromAddress, toAddress)
