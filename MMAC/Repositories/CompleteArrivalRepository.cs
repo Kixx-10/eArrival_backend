@@ -18,14 +18,29 @@ namespace MMAC.Repositories
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                //if new user generate id
-                if (traveller.TravellerId == Guid.Empty)
-                {
-                    traveller.TravellerId = Guid.NewGuid();
-                }
-                await _context.Traveller.AddAsync(traveller);
+                var isNewTraveller = traveller.TravellerId == Guid.Empty;
 
-                //foreign key traveller id ==traveller.id
+                if (isNewTraveller)
+                {
+                    // if new generate new id
+                    traveller.TravellerId = Guid.NewGuid();
+                    await _context.Traveller.AddAsync(traveller);
+                }
+                else
+                {
+                    var trackedTraveller = _context.Traveller.Local.FirstOrDefault(t => t.TravellerId == traveller.TravellerId);
+
+                    if (trackedTraveller != null)
+                    {
+                        _context.Entry(trackedTraveller).CurrentValues.SetValues(traveller);
+                    }
+                    else
+                    {
+                        _context.Traveller.Attach(traveller);
+                        _context.Entry(traveller).State = EntityState.Modified;
+                    }
+                }
+
                 application.TravellerId = traveller.TravellerId;
                 await _context.ArrivalApplication.AddAsync(application);
 
@@ -37,7 +52,14 @@ namespace MMAC.Repositories
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                Console.WriteLine($"[DB ERROR]: {ex.ToString()}");
+
+                Console.WriteLine($"\n=================== 🚨 [SUBMIT REPOSITORY ERROR] ===================");
+                Console.WriteLine($"💡 Message: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"🔍 Inner Exception: {ex.InnerException.Message}");
+                }
+                Console.WriteLine("====================================================================\n");
                 return Guid.Empty;
             }
         }
@@ -64,9 +86,15 @@ namespace MMAC.Repositories
                 .Include(x => x.Township)
                     .ThenInclude(t => t!.District)
                         .ThenInclude(d => d!.StateRegion)
-                .FirstOrDefaultAsync(a => a.AppNo == appNo);
+                .FirstOrDefaultAsync(a => a.AppNo == appNo && a.AppStatus == "Submitted");
         }
 
+        public async Task<ArrivalApplication?> GetActiveApplicationByReferenceNoAsync(string referenceNo)
+        {
+            return await _context.ArrivalApplication
+                .Include(a => a.Traveller)
+                .FirstOrDefaultAsync(a => a.ReferenceNo == referenceNo && a.AppStatus == "Submitted");
+        }
         public async Task<bool> IsReferenceNoExistsAsync(string referenceNo)
         {
             return await _context.ArrivalApplication.AnyAsync(a => a.ReferenceNo == referenceNo);

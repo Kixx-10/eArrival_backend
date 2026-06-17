@@ -9,7 +9,6 @@ namespace MMAC.Services.ArrivalInterface
     {
         private readonly ICompleteArrivalRepository _repository;
         private readonly IMapper _mapper;
-
         public CompleteArrivalService(ICompleteArrivalRepository repository, IMapper mapper)
         {
             _repository = repository;
@@ -20,7 +19,6 @@ namespace MMAC.Services.ArrivalInterface
         {
             try
             {
-                // Validate Myanmar Citizen
                 if (dto.CountryOfBirthCode == "MMR")
                 {
                     if (string.IsNullOrWhiteSpace(dto.NRC) || string.IsNullOrWhiteSpace(dto.FatherName))
@@ -28,38 +26,60 @@ namespace MMAC.Services.ArrivalInterface
                         throw new ArgumentException("Need NRC and FatherName for Myanmar Citizens");
                     }
                 }
-                //validate  from repository 
-                bool isDuplicateApplication = await _repository.IsDuplicateSubmissionWithin24HoursAsync(
-                    dto.FullName,
-                    dto.PassportNo,
-                    dto.IssuedCountryCode,
-                    dto.DOB
-                );
 
-                if (isDuplicateApplication)
-                {
-                    // Controller BadRequest(ex.Message) 
-                    throw new InvalidOperationException("You have already submitted an application within the last 24 hours. Please try again after 24 hours.");
-                }
-                // ၂။ AutoMapper Mapping
+                string finalReferenceNo = string.Empty;
+                Guid currentTravellerId = Guid.Empty;
+                bool isUpdateFlow = !string.IsNullOrWhiteSpace(dto.ReferenceNo);
+
                 var traveller = _mapper.Map<Traveller>(dto);
                 var arrivalApplication = _mapper.Map<ArrivalApplication>(dto);
 
-                //  New Application 
-                string currentYear = DateTime.Now.Year.ToString();
-                string finalReferenceNo = string.Empty;
-                bool isDuplicate = true;
-
-                while (isDuplicate)
+                if (isUpdateFlow)
                 {
-                    int randomNumber = Random.Shared.Next(10000000, 99999999);
-                    finalReferenceNo = $"MMR-{currentYear}-{randomNumber}";
-                    isDuplicate = await _repository.IsReferenceNoExistsAsync(finalReferenceNo);
-                }
-                arrivalApplication.ReferenceNo = finalReferenceNo;
-                arrivalApplication.AppNo = Guid.NewGuid();
-                arrivalApplication.AppStatus = "Submitted";
 
+                    //UPDATE APPLICATION FLOW
+                    var oldApp = await _repository.GetActiveApplicationByReferenceNoAsync(dto.ReferenceNo!);
+                    if (oldApp == null)
+                    {
+                        throw new KeyNotFoundException($"Active application with reference number '{dto.ReferenceNo}' was not found.");
+                    }
+                    oldApp.AppStatus = "Invalid";
+                    oldApp.UpdatedDate = DateTime.UtcNow;
+                    currentTravellerId = oldApp.TravellerId;
+                    traveller.TravellerId = currentTravellerId;
+                    finalReferenceNo = oldApp.ReferenceNo;
+                }
+                else
+                {
+
+                    // NEW APPLICATION FLOW
+
+                    bool isDuplicateApplication = await _repository.IsDuplicateSubmissionWithin24HoursAsync(
+                        dto.FullName, dto.PassportNo, dto.IssuedCountryCode, dto.DOB);
+
+                    if (isDuplicateApplication)
+                    {
+                        throw new InvalidOperationException("You have already submitted an application within the last 24 hours. Please try again after 24 hours.");
+                    }
+
+                    currentTravellerId = Guid.Empty;
+                    traveller.TravellerId = Guid.Empty;
+
+                    // new generate Reference No 
+                    string currentYear = DateTime.Now.Year.ToString();
+                    bool isDuplicate = true;
+
+                    while (isDuplicate)
+                    {
+                        int randomNumber = Random.Shared.Next(10000000, 99999999);
+                        finalReferenceNo = $"MMR-{currentYear}-{randomNumber}";
+                        isDuplicate = await _repository.IsReferenceNoExistsAsync(finalReferenceNo);
+                    }
+                }
+                arrivalApplication.AppNo = Guid.NewGuid();
+                arrivalApplication.ReferenceNo = finalReferenceNo;
+                arrivalApplication.AppStatus = "Submitted";
+                arrivalApplication.CreatedDate = DateTime.UtcNow;
                 Guid savedAppNo = await _repository.SubmitArrivalApplicationAsync(traveller, arrivalApplication);
 
                 return new ArrivalSubmitResponseDTO
@@ -68,10 +88,9 @@ namespace MMAC.Services.ArrivalInterface
                     ReferenceNo = arrivalApplication.ReferenceNo
                 };
             }
-            catch (ArgumentException)
-            {
-                throw;
-            }
+            catch (ArgumentException) { throw; }
+            catch (KeyNotFoundException) { throw; }
+            catch (InvalidOperationException) { throw; }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in SubmitAsync: {ex.Message}");
@@ -113,3 +132,4 @@ namespace MMAC.Services.ArrivalInterface
         }
     }
 }
+
