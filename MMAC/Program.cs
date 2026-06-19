@@ -6,8 +6,10 @@ using MMAC.Data;
 using MMAC.Interfaces;
 using MMAC.Profiles;
 using MMAC.Repositories;
+using MMAC.Repositories.DashboardRepository;
 using MMAC.Services;
 using MMAC.Services.ArrivalInterface;
+using MMAC.Services.DashboardService;
 using MMAC.Services.PdfService;
 using MMAC.Services.PortOfArrivalService;
 using MMAC.Services.SearchService;
@@ -15,6 +17,7 @@ using MMAC.Services.UpdateService;
 using MMAC.Services.UtilityService;
 using MMAC.Validations;
 using Scalar.AspNetCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +41,10 @@ builder.Services.AddScoped<IMyanmarSearchService, MyanmarSearchService>();
 builder.Services.AddScoped<ICompleteArrivalService, CompleteArrivalService>();
 
 builder.Services.AddScoped<ICompleteArrivalRepository, CompleteArrivalRepository>();
+builder.Services.AddScoped<ICompleteArrivalService, CompleteArrivalService>();
+
+builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 builder.Services.AddScoped<IUtilityService, UtilityService>();
 
@@ -48,6 +55,13 @@ builder.Services.AddScoped<IPdfService, PdfService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// skipt  infinate loop
+builder.Services.AddControllers().AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    });
 
 
 

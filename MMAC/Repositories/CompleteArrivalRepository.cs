@@ -99,5 +99,31 @@ namespace MMAC.Repositories
         {
             return await _context.ArrivalApplication.AnyAsync(a => a.ReferenceNo == referenceNo);
         }
+        public async Task<bool> ApproveApplicationAsync(Guid appNo, string appStatus, string approveUser)
+        {
+            var application = await _context.ArrivalApplication.FirstOrDefaultAsync(a => a.AppNo == appNo);
+
+            if (application == null)
+            {
+                return false;
+            }
+
+            application.AppStatus = appStatus;
+            application.UpdatedDate = DateTime.UtcNow;
+
+            if (appStatus.Equals("Approved", StringComparison.OrdinalIgnoreCase))
+            {
+                application.ApprovedDate = DateTime.UtcNow;
+                application.ApprovedUser = approveUser;
+            }
+            else
+            {
+                application.ApprovedDate = null;
+                application.ApprovedUser = null;
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

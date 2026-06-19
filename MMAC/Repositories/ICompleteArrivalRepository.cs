@@ -10,5 +10,7 @@ namespace MMAC.Repositories
         Task<ArrivalApplication?> GetArrivalApplicationDetailsAsync(Guid appNo);
         Task<bool> IsReferenceNoExistsAsync(string referenceNo);
         Task<ArrivalApplication?> GetActiveApplicationByReferenceNoAsync(string referenceNo);
+        Task<bool> ApproveApplicationAsync(Guid Appno, string AppStatus, string ApproveUser);
+
     }
 }

@@ -130,6 +130,19 @@ namespace MMAC.Services.ArrivalInterface
                 throw;
             }
         }
+
+        public async Task<bool> ApproveApplication(Guid AppNo, string AppStatus, string ApproveUser)
+        {
+            try
+            {
+                return await _repository.ApproveApplicationAsync(AppNo, AppStatus, ApproveUser);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in ApproveApplication: {ex.Message}");
+                throw;
+            }
+        }
     }
 }
 
