@@ -38,6 +38,7 @@ builder.Services.AddScoped<IMyanmarSearchService, MyanmarSearchService>();
 builder.Services.AddScoped<ICompleteArrivalService, CompleteArrivalService>();
 
 builder.Services.AddScoped<ICompleteArrivalRepository, CompleteArrivalRepository>();
+builder.Services.AddScoped<ICompleteArrivalService, CompleteArrivalService>();
 
 builder.Services.AddScoped<IUtilityService, UtilityService>();
 
