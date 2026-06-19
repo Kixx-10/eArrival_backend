@@ -8,18 +8,18 @@ namespace MMAC.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SubmitApplicationController : ControllerBase
+    public class ApplicationController : ControllerBase
     {
-        private readonly ICompleteArrival _completeArrival;
+        private readonly ICompleteArrivalService _completeArrival;
         private readonly IPdfService _pdfService;
 
-        public SubmitApplicationController(ICompleteArrival completeArrival, IPdfService pdfService)
+        public ApplicationController(ICompleteArrivalService completeArrival, IPdfService pdfService)
         {
             _completeArrival = completeArrival;
             _pdfService = pdfService;
         }
 
-        [HttpPost]
+        [HttpPost("Submit&UpdateApplication")]
         public async Task<IActionResult> Submit([FromBody] CompleteArrivalDTO model)
         {
             if (!ModelState.IsValid)
@@ -50,7 +50,7 @@ namespace MMAC.Controllers
                     message = "Application submitted successfully",
                     applicationNo = result.ApplicationNo.ToString(),
                     referenceNo = result.ReferenceNo ?? "N/A",
-                    pdfData = pdfBase64 
+                    pdfData = pdfBase64
                 });
             }
             catch (InvalidOperationException ex)
@@ -67,7 +67,7 @@ namespace MMAC.Controllers
             }
         }
 
-        [HttpGet("{AppNo}")]
+        [HttpGet("SearchApplicationByQRCode{AppNo}")]
         public async Task<IActionResult> GetDetails(Guid AppNo)
         {
             try

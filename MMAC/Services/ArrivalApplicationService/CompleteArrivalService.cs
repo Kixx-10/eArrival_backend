@@ -5,7 +5,7 @@ using MMAC.Repositories;
 
 namespace MMAC.Services.ArrivalInterface
 {
-    public class CompleteArrivalService : ICompleteArrival
+    public class CompleteArrivalService : ICompleteArrivalService
     {
         private readonly ICompleteArrivalRepository _repository;
         private readonly IMapper _mapper;

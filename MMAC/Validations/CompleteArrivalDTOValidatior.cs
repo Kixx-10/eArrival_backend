@@ -37,6 +37,8 @@ namespace MMAC.Validations
             RuleFor(x => x.PassportNo).NotEmpty().WithMessage("PassportNo is required")
                 .MaximumLength(20).WithMessage("Passport cannot more 50 characters");
 
+            RuleFor(x => x.VisaNo).MaximumLength(50).WithMessage("Visa Number cannot more 50 characters");
+
             RuleFor(x => x.IssuedCountryCode).NotEmpty().WithMessage("IssuedCountryCode is required")
                 .MaximumLength(3).WithMessage("IssuedCounntryCode cannot more 3 characters");
 
@@ -71,7 +73,7 @@ namespace MMAC.Validations
                 .MaximumLength(20).WithMessage("Vehicle Name cannot exceed 20 characters.");
 
             RuleFor(x => x.Accommodation)
-                .MaximumLength(20).WithMessage("Accommodation info cannot exceed 20 characters.");
+                .MaximumLength(50).WithMessage("Accommodation info cannot exceed 20 characters.");
 
             RuleFor(x => x.AddressInMyanmar)
                 .NotEmpty().WithMessage("Address in Myanmar is required.")
@@ -84,7 +86,7 @@ namespace MMAC.Validations
             RuleFor(x => x.StateRegionId).GreaterThan(0).WithMessage("State or Region Selection is required.");
 
             RuleFor(x => x.MobileNumberMM)
-                .MaximumLength(20).WithMessage("Myanmar Mobile Number cannot exceed 20 characters.");
+                .MaximumLength(11).WithMessage("Myanmar Mobile Number cannot exceed 20 characters.");
 
             RuleFor(x => x.PreviousCity)
                 .MaximumLength(20).WithMessage("Previous City cannot exceed 20 characters.");
