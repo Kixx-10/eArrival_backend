@@ -8,18 +8,19 @@ namespace MMAC.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SubmitApplicationController : ControllerBase
+    public class ApplicationController : ControllerBase
     {
-        private readonly ICompleteArrival _completeArrival;
+        private readonly ICompleteArrivalService _completeArrival;
         private readonly IPdfService _pdfService;
 
-        public SubmitApplicationController(ICompleteArrival completeArrival, IPdfService pdfService)
+        public ApplicationController(ICompleteArrivalService completeArrival, IPdfService pdfService)
+
         {
             _completeArrival = completeArrival;
             _pdfService = pdfService;
         }
 
-        [HttpPost]
+        [HttpPost("Submit&UpdateApplication")]
         public async Task<IActionResult> Submit([FromBody] CompleteArrivalDTO model)
         {
             if (!ModelState.IsValid)
@@ -50,7 +51,7 @@ namespace MMAC.Controllers
                     message = "Application submitted successfully",
                     applicationNo = result.ApplicationNo.ToString(),
                     referenceNo = result.ReferenceNo ?? "N/A",
-                    pdfData = pdfBase64 
+                    pdfData = pdfBase64
                 });
             }
             catch (InvalidOperationException ex)
@@ -67,7 +68,7 @@ namespace MMAC.Controllers
             }
         }
 
-        [HttpGet("{AppNo}")]
+        [HttpGet("SearchApplicationByQRCode{AppNo}")]
         public async Task<IActionResult> GetDetails(Guid AppNo)
         {
             try
@@ -97,5 +98,44 @@ namespace MMAC.Controllers
 
         }
 
+<<<<<<< HEAD:MMAC/Controllers/SubmitApplicationController.cs
+=======
+        [HttpPost("ApproveApplication")]
+        public async Task<IActionResult> ApproveApplication([FromBody] RequestUpdateStatusDTO request)
+        {
+            // Check if AppNo or AppStatus is missing
+            if (request.AppNo == Guid.Empty || string.IsNullOrWhiteSpace(request.AppStatus))
+            {
+                return BadRequest(new { message = "AppNo and Status are required." });
+            }
+
+            try
+            {
+                bool isSuccess = await _completeArrival.ApproveApplication(request.AppNo, request.AppStatus, request.ApproveUser);
+
+                // Check if the application exists
+                if (!isSuccess)
+                {
+                    return NotFound(new { message = "Application not found." });
+                }
+
+                // Set the success message based on the status
+                string responseMessage = request.AppStatus.Equals("Approved", StringComparison.OrdinalIgnoreCase)
+                    ? "Application approved successfully."
+                    : "Application rejected successfully.";
+
+                return Ok(new
+                {
+                    message = responseMessage,
+                    status = request.AppStatus
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating the application status.", error = ex.Message });
+            }
+        }
+
+>>>>>>> 9fb4ce5fe6380d65c4d79ec06d9b3cf3217db631:MMAC/Controllers/ApplicationController.cs
     }
 }

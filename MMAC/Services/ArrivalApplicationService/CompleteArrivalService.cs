@@ -5,7 +5,7 @@ using MMAC.Repositories;
 
 namespace MMAC.Services.ArrivalInterface
 {
-    public class CompleteArrivalService : ICompleteArrival
+    public class CompleteArrivalService : ICompleteArrivalService
     {
         private readonly ICompleteArrivalRepository _repository;
         private readonly IMapper _mapper;
@@ -103,7 +103,23 @@ namespace MMAC.Services.ArrivalInterface
             try
             {
                 var app = await _repository.GetArrivalApplicationDetailsAsync(AppNo);
-                if (app == null) return null;
+
+                if (app == null)
+                {
+                    return null;
+                }
+
+                if (app.AppStatus?.Equals("Invalid", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    return null;
+                }
+
+                if (app.AppStatus?.Equals("Approved", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    throw new InvalidOperationException("This Traveller already Approved.");
+                }
+
+                //Success
                 var result = _mapper.Map<ResponseCompleteArrivalDTO>(app);
 
                 if (app.Traveller != null) _mapper.Map(app.Traveller, result);
@@ -127,6 +143,19 @@ namespace MMAC.Services.ArrivalInterface
             catch (Exception ex)
             {
                 Console.WriteLine($"Could not find or map {AppNo}. Exception: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task<bool> ApproveApplication(Guid AppNo, string AppStatus, string ApproveUser)
+        {
+            try
+            {
+                return await _repository.ApproveApplicationAsync(AppNo, AppStatus, ApproveUser);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in ApproveApplication: {ex.Message}");
                 throw;
             }
         }
