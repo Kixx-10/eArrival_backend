@@ -52,14 +52,11 @@ namespace MMAC.Repositories
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-
-                Console.WriteLine($"\n=================== 🚨 [SUBMIT REPOSITORY ERROR] ===================");
                 Console.WriteLine($"💡 Message: {ex.Message}");
                 if (ex.InnerException != null)
                 {
-                    Console.WriteLine($"🔍 Inner Exception: {ex.InnerException.Message}");
+                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
                 }
-                Console.WriteLine("====================================================================\n");
                 return Guid.Empty;
             }
         }
@@ -86,7 +83,7 @@ namespace MMAC.Repositories
                 .Include(x => x.Township)
                     .ThenInclude(t => t!.District)
                         .ThenInclude(d => d!.StateRegion)
-                .FirstOrDefaultAsync(a => a.AppNo == appNo && a.AppStatus == "Submitted");
+                .FirstOrDefaultAsync(a => a.AppNo == appNo);
         }
 
         public async Task<ArrivalApplication?> GetActiveApplicationByReferenceNoAsync(string referenceNo)
@@ -94,6 +91,7 @@ namespace MMAC.Repositories
             return await _context.ArrivalApplication
                 .Include(a => a.Traveller)
                 .FirstOrDefaultAsync(a => a.ReferenceNo == referenceNo && a.AppStatus == "Submitted");
+
         }
         public async Task<bool> IsReferenceNoExistsAsync(string referenceNo)
         {
