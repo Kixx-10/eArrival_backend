@@ -103,7 +103,23 @@ namespace MMAC.Services.ArrivalInterface
             try
             {
                 var app = await _repository.GetArrivalApplicationDetailsAsync(AppNo);
-                if (app == null) return null;
+
+                if (app == null)
+                {
+                    return null;
+                }
+
+                if (app.AppStatus?.Equals("Invalid", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    return null;
+                }
+
+                if (app.AppStatus?.Equals("Approved", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    throw new InvalidOperationException("This Traveller already Approved.");
+                }
+
+                //Success
                 var result = _mapper.Map<ResponseCompleteArrivalDTO>(app);
 
                 if (app.Traveller != null) _mapper.Map(app.Traveller, result);
