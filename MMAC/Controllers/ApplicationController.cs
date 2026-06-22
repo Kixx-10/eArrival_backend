@@ -98,8 +98,7 @@ namespace MMAC.Controllers
 
         }
 
-<<<<<<< HEAD:MMAC/Controllers/SubmitApplicationController.cs
-=======
+
         [HttpPost("ApproveApplication")]
         public async Task<IActionResult> ApproveApplication([FromBody] RequestUpdateStatusDTO request)
         {
@@ -135,7 +134,5 @@ namespace MMAC.Controllers
                 return StatusCode(500, new { message = "An error occurred while updating the application status.", error = ex.Message });
             }
         }
-
->>>>>>> 9fb4ce5fe6380d65c4d79ec06d9b3cf3217db631:MMAC/Controllers/ApplicationController.cs
     }
 }
