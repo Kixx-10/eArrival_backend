@@ -2,7 +2,10 @@
 {
     public class CompleteArrivalDTO
     {
+        public Guid TravellerId { get; set; }
+
         public string? ReferenceNo { get; set; }
+
         // Traveller Information
         public string FullName { get; set; } = string.Empty;
         public string Gender { get; set; } = string.Empty;

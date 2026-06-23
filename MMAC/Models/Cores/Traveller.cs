@@ -11,8 +11,6 @@ namespace MMAC.Models.Cores
         [Key]
         public Guid TravellerId { get; set; } = Guid.NewGuid();
 
-        public Guid UserId { get; set; } = Guid.NewGuid();
-
         [Required]
         [MaxLength(50)]
         public string FullName { get; set; } = string.Empty;

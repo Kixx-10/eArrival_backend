@@ -4,5 +4,6 @@
     {
         public Guid ApplicationNo { get; set; }
         public string ReferenceNo { get; set; } = string.Empty;
+       // public Guid TravellerNo { get; set; }
     }
 }
