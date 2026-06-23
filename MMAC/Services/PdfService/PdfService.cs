@@ -12,108 +12,137 @@ using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-
+using MMAC.Services.AuditLogService;
+using MMAC.Models.Cores;
 
 namespace MMAC.Services.PdfService
 {
-    public class PdfService: IPdfService
+    public class PdfService : IPdfService
     {
         private readonly IConfiguration _configuration;
+        private readonly IAuditLogService _auditLogService;
+        private readonly IServiceScopeFactory _scopeFactory;
 
-        public PdfService(IConfiguration configuration)
+        public PdfService(IConfiguration configuration, IAuditLogService auditLogService, IServiceScopeFactory scopeFactory)
         {
             _configuration = configuration;
+            _auditLogService = auditLogService;
+            _scopeFactory = scopeFactory;
         }
 
         public async Task<byte[]> GenerateArrivalPdfAsync(CompleteArrivalDTO model, Guid applicationNo, string referenceNo)
         {
             return await Task.Run(() =>
             {
-                // 1. Spire PDF Document အသစ်ဆောက်ခြင်း
                 PdfDocument doc = new PdfDocument();
                 PdfPageBase page = doc.Pages.Add(PdfPageSize.A4, new PdfMargins(40));
 
-                // Fonts & Colors သတ်မှတ်ခြင်း
-                PdfFont titleFont = new PdfFont(PdfFontFamily.Helvetica, 22f, PdfFontStyle.Bold);
-                PdfFont labelFont = new PdfFont(PdfFontFamily.Helvetica, 11f, PdfFontStyle.Bold);
-                PdfFont valueFont = new PdfFont(PdfFontFamily.Helvetica, 11f, PdfFontStyle.Regular);
+                // Font definitions
+                PdfFont titleFont = new PdfFont(PdfFontFamily.Helvetica, 16f, PdfFontStyle.Bold);
+                PdfFont subTitleFont = new PdfFont(PdfFontFamily.Helvetica, 12f, PdfFontStyle.Regular);
+                PdfFont sectionFont = new PdfFont(PdfFontFamily.Helvetica, 12f, PdfFontStyle.Bold);
+                PdfFont labelFont = new PdfFont(PdfFontFamily.Helvetica, 9f, PdfFontStyle.Bold);
+                PdfFont valueFont = new PdfFont(PdfFontFamily.Helvetica, 10f, PdfFontStyle.Regular);
+
                 PdfBrush blackBrush = PdfBrushes.Black;
+                PdfBrush redBrush = PdfBrushes.DarkRed;
                 PdfBrush grayBrush = PdfBrushes.DarkGray;
 
                 float currentY = 10f;
+                float pageWidth = page.Canvas.ClientSize.Width;
 
-                // 2. QRCoder သုံးပြီး ရလာတဲ့ ApplicationNo ကို QR Code (Image) အဖြစ် ဆွဲခြင်း
+                // --- HEADER ---
+                PdfStringFormat centerFormat = new PdfStringFormat(PdfTextAlignment.Center);
+                page.Canvas.DrawString("REPUBLIC OF THE UNION OF MYANMAR", titleFont, redBrush, pageWidth / 2, currentY, centerFormat);
+                currentY += 20f;
+                page.Canvas.DrawString("Electronic Arrival Declaration (e-Arrival)", subTitleFont, grayBrush, pageWidth / 2, currentY, centerFormat);
+                currentY += 40f;
+
+                // --- QR CODE & DE NUMBER ---
                 byte[] qrBytes = GenerateQrCodeBytes(applicationNo.ToString());
                 using (MemoryStream qrStream = new MemoryStream(qrBytes))
                 {
                     PdfImage qrImage = PdfImage.FromStream(qrStream);
-                    float qrX = (page.Canvas.ClientSize.Width - 120) / 2; // Center alignment
-                    page.Canvas.DrawImage(qrImage, qrX, currentY, 120, 120);
-                    currentY += 130f;
+                    page.Canvas.DrawImage(qrImage, pageWidth - 100, currentY, 90, 90);
                 }
 
-                // 3. Title (Arrival Form)
-                PdfStringFormat centerFormat = new PdfStringFormat(PdfTextAlignment.Center);
-                page.Canvas.DrawString("Arrival Form", titleFont, blackBrush, page.Canvas.ClientSize.Width / 2, currentY, centerFormat);
-                currentY += 40f;
-
-                // 4. Personal Information (Key-Value) စာသားများ ရေးခြင်း
-                // Application ID
-                page.Canvas.DrawString("Application ID No.", labelFont, blackBrush, 10, currentY);
-                currentY += 18f;
-                page.Canvas.DrawString(applicationNo.ToString(), valueFont, grayBrush, 10, currentY);
+                page.Canvas.DrawString("Arrival Approval ID (DE Number):", labelFont, blackBrush, 10, currentY);
+                currentY += 15f;
+                page.Canvas.DrawString(referenceNo.ToString(), new PdfFont(PdfFontFamily.Helvetica, 14f, PdfFontStyle.Bold), redBrush, 10, currentY);
                 currentY += 25f;
 
-                // Name
-                page.Canvas.DrawString("Name", labelFont, blackBrush, 10, currentY);
-                currentY += 18f;
-                page.Canvas.DrawString(model.FullName, valueFont, blackBrush, 10, currentY);
-                currentY += 25f;
+                string infoText = "Please present this approval code and QR code, along with your valid passport and visa (if applicable), to the Myanmar Immigration Officer upon arrival. Valid for a single entry.";
+                PdfTextWidget textWidget = new PdfTextWidget(infoText, new PdfFont(PdfFontFamily.Helvetica, 9f, PdfFontStyle.Regular), grayBrush);
+                PdfTextLayout textLayout = new PdfTextLayout();
+                textLayout.Layout = PdfLayoutType.Paginate;
+                textWidget.Draw(page, new RectangleF(10, currentY, pageWidth - 120, 50), textLayout);
+                currentY += 60f;
 
-                // Gender
-                page.Canvas.DrawString("Gender", labelFont, blackBrush, 10, currentY);
-                currentY += 18f;
-                page.Canvas.DrawString(model.Gender, valueFont, blackBrush, 10, currentY);
-                currentY += 25f;
+                // --- PART I: Personal Particulars ---
+                page.Canvas.DrawRectangle(PdfPens.DarkRed, PdfBrushes.LightGray, new RectangleF(10, currentY, pageWidth - 20, 20));
+                page.Canvas.DrawString("PART I: Personal Particulars", sectionFont, blackBrush, 15, currentY + 3);
+                currentY += 30f;
 
-                // Nationality
-                page.Canvas.DrawString("Nationality", labelFont, blackBrush, 10, currentY);
-                currentY += 18f;
-                page.Canvas.DrawString(model.CountryOfBirthCode, valueFont, blackBrush, 10, currentY);
-                currentY += 25f;
+                DrawField(page, "FULL NAME", model.FullName, labelFont, valueFont, 10, currentY);
+                DrawField(page, "PASSPORT NUMBER", model.PassportNo, labelFont, valueFont, pageWidth / 2, currentY);
+                currentY += 35f;
 
-                // Passport / Visa No.
-                page.Canvas.DrawString("Passport / Visa No.", labelFont, blackBrush, 10, currentY);
-                currentY += 18f;
-                page.Canvas.DrawString(model.PassportNo, valueFont, blackBrush, 10, currentY);
-                currentY += 40f;
+                DrawField(page, "NATIONALITY", model.CountryOfBirthCode, labelFont, valueFont, 10, currentY);
+                DrawField(page, "GENDER", model.Gender, labelFont, valueFont, pageWidth / 2, currentY);
+                currentY += 35f;
 
-                // 5. Grid Table အောက်ခြေအပိုင်း တည်ဆောက်ခြင်း
-                PdfTable table = new PdfTable();
-                DataTable dt = new DataTable();
-                dt.Columns.Add("Key");
-                dt.Columns.Add("Value");
+                DrawField(page, "MOBILE NUMBER", model.MobileNumber, labelFont, valueFont, 10, currentY);
+                currentY += 45f;
 
-                dt.Rows.Add("Arrival Date", model.ArrivalDate);
-                dt.Rows.Add("Purpose of Visit", model.PurposeOfVisit);
-                dt.Rows.Add("Contact (MM)", model.MobileNumber);
-                dt.Rows.Add("Address in Myanmar", model.AddressInMyanmar);
+                // --- PART II: Trip Details ---
+                page.Canvas.DrawRectangle(PdfPens.DarkRed, PdfBrushes.LightGray, new RectangleF(10, currentY, pageWidth - 20, 20));
+                page.Canvas.DrawString("PART II: Trip Details", sectionFont, blackBrush, 15, currentY + 3);
+                currentY += 30f;
 
-                table.DataSource = dt;
-                table.Style.CellPadding = 8f;
-                table.Style.ShowHeader = false;// Header ပိတ်ထားမည်
-                table.Style.BorderPen = new PdfPen(Color.LightGray, 0.5f);
-                table.Style.DefaultStyle.Font = valueFont;
+                DrawField(page, "DATE OF ARRIVAL", model.ArrivalDate.ToString("dd MMM yyyy"), labelFont, valueFont, 10, currentY);
+                DrawField(page, "PURPOSE OF VISIT", model.PurposeOfVisit, labelFont, valueFont, pageWidth / 2, currentY);
+                currentY += 35f;
 
-                table.Draw(page, new PointF(10, currentY));
+                DrawField(page, "ADDRESS IN DESTINATION", model.AddressInMyanmar, labelFont, valueFont, 10, currentY);
+                currentY += 55f;
 
-                // 6. Memory Stream ထဲသို့ သိမ်းဆည်းပြီး Byte Array ပြန်ထုတ်ပေးခြင်း
+                // --- PART III: Health & Customs Declaration ---
+                page.Canvas.DrawRectangle(PdfPens.DarkRed, PdfBrushes.LightGray, new RectangleF(10, currentY, pageWidth - 20, 20));
+                page.Canvas.DrawString("PART III: Health & Customs Declaration", sectionFont, blackBrush, 15, currentY + 3);
+                currentY += 30f;
+
+                PdfTextWidget noticeWidget = new PdfTextWidget("NOTICE: False declarations are subject to prosecution under the laws of the Republic of the Union of Myanmar.", new PdfFont(PdfFontFamily.Helvetica, 9f, PdfFontStyle.Bold), PdfBrushes.DarkGoldenrod);
+                noticeWidget.Draw(page, new RectangleF(10, currentY, pageWidth - 20, 30), textLayout);
+                currentY += 30f;
+
+                page.Canvas.DrawString("Are you carrying currency exceeding USD 10,000 or equivalent?", valueFont, blackBrush, 10, currentY);
+                page.Canvas.DrawString("NO", labelFont, blackBrush, pageWidth - 40, currentY);
+                currentY += 20f;
+
+                page.Canvas.DrawString("Are you currently experiencing fever, cough, or shortness of breath?", valueFont, blackBrush, 10, currentY);
+                page.Canvas.DrawString("NO", labelFont, blackBrush, pageWidth - 40, currentY);
+                currentY += 50f;
+
+                // --- FOOTER ---
+                page.Canvas.DrawLine(PdfPens.Gray, 10, currentY, pageWidth - 10, currentY);
+                currentY += 10f;
+                string footerText = "IMPORTANT: This acknowledgment does not guarantee entry into Myanmar. The Department of Immigration and Population officers will assess your eligibility for entry upon arrival. Ensure your passport is valid for at least 6 months and you possess a valid visa if required. This document was generated electronically.";
+                PdfTextWidget footerWidget = new PdfTextWidget(footerText, new PdfFont(PdfFontFamily.Helvetica, 8f, PdfFontStyle.Regular), grayBrush);
+                footerWidget.Draw(page, new RectangleF(10, currentY, pageWidth - 20, 50), textLayout);
+
                 using MemoryStream outputStream = new MemoryStream();
                 doc.SaveToStream(outputStream, FileFormat.PDF);
                 doc.Close();
 
                 return outputStream.ToArray();
             });
+        }
+
+        // Helper Method to Draw Labels and Values neatly
+        private void DrawField(PdfPageBase page, string label, string value, PdfFont labelFont, PdfFont valueFont, float x, float y)
+        {
+            page.Canvas.DrawString(label, labelFont, PdfBrushes.DarkGray, x, y);
+            page.Canvas.DrawString(string.IsNullOrEmpty(value) ? "N/A" : value, valueFont, PdfBrushes.Black, x, y + 15f);
         }
 
         // QRCoder Helper
@@ -126,21 +155,25 @@ namespace MMAC.Services.PdfService
         }
 
         // Email sending Background Task
-        public void SendPdfEmailInBackground(string toEmail, string applicationId, byte[] pdfBytes)
+        public void SendPdfEmailInBackground(string toEmail, string applicationId, byte[] pdfBytes, string referenceNo,Guid travellerId)
         {
-            if (string.IsNullOrEmpty(toEmail)) return;
-            string senderEmail = _configuration["EmailSettings:SenderEmail"]!;
-            string senderName = _configuration["EmailSettings:SenderName"]!;
-            string appPassword = _configuration["EmailSettings:AppPassword"]!;
 
             Task.Run(async () =>
             {
+                using var scope = _scopeFactory.CreateScope();
+
+                var scopedAuditLogService = scope.ServiceProvider.GetRequiredService<IAuditLogService>();
+
                 try
                 {
+                    string senderEmail = _configuration["EmailSettings:SenderEmail"] ?? "jr.paingwaiyankhant@gmail.com";
+                    string senderName = _configuration["EmailSettings:SenderName"] ?? "MMAC Arrival System";
+                    string appPassword = _configuration["EmailSettings:AppPassword"] ?? "";
+
                     var fromAddress = new MailAddress(senderEmail, senderName);
                     var toAddress = new MailAddress(toEmail);
-                    const string subject = "Your Arrival Form Registration Success";
-                    const string body = "Dear Applicant,\n\nYour application has been submitted successfully. Please find your Arrival Form PDF attached below.";
+                    string subject = "Your e-Arrival Form Submission";
+                    string body = "Dear Applicant,\n\nYour application has been submitted successfully. Please find your official e-Arrival Form PDF attached below.";
 
                     using var smtp = new SmtpClient
                     {
@@ -159,13 +192,36 @@ namespace MMAC.Services.PdfService
                     };
 
                     using var ms = new MemoryStream(pdfBytes);
-                    message.Attachments.Add(new Attachment(ms, $"ArrivalForm_{applicationId}.pdf", "application/pdf"));
+                    message.Attachments.Add(new Attachment(ms, $"MM_ArrivalForm_{referenceNo}.pdf", "application/pdf"));
 
                     await smtp.SendMailAsync(message);
+
+                    var successLogObj = new System.Collections.Generic.Dictionary<string, string>
+                {
+                    { "To", toEmail },
+                    { "AppId", applicationId },
+                    { "Status", "Success" }
+                };
+
+                    await scopedAuditLogService.LogAsync("EMAIL_SENT_SUCCESS", successLogObj, travellerId);
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"[SMTP Email Error]: {ex.Message}");
+                    try
+                    {
+                        var errorLogObj = new System.Collections.Generic.Dictionary<string, string>
+                    {
+                        { "To", toEmail },
+                        { "ErrorMessage", ex.Message }
+                    };
+
+                        await scopedAuditLogService.LogAsync("EMAIL_SENT_FAILED", errorLogObj, travellerId);
+                    }
+                    catch (Exception logEx)
+                    {
+                        Console.WriteLine($"[Critical Audit Log Error]: {logEx.Message}");
+                    }
                 }
             });
         }
