@@ -47,13 +47,13 @@ namespace MMAC.Models.Cores
         public virtual PortOfArrival? selectedPortOfArrival { get; set; }
 
         [Required]
-        [MaxLength(10)]
-        [Column(TypeName = "varchar(10)")]
+        [MaxLength(20)]
+        [Column(TypeName = "varchar(20)")]
         public string VehicleNumber { get; set; } = string.Empty;
 
         [Required]
-        [MaxLength(20)]
-        [Column(TypeName = "varchar(20)")]
+        [MaxLength(50)]
+        [Column(TypeName = "varchar(50)")]
         public string VehicleName { get; set; } = string.Empty;
 
         [MaxLength(100)]
@@ -73,8 +73,8 @@ namespace MMAC.Models.Cores
         public int StateRegionId { get; set; }
 
 
-        [MaxLength(20)]
-        [Column(TypeName = "varchar(20)")]
+        [MaxLength(11)]
+        [Column(TypeName = "varchar(11)")]
         public string? MobileNumberMM { get; set; }
 
         [MaxLength(100)]
@@ -82,7 +82,7 @@ namespace MMAC.Models.Cores
         public string PurposeOfVisit { get; set; } = string.Empty;
 
         [Required]
-        [MaxLength(20)]
+        [MaxLength(50)]
         public string PreviousCity { get; set; } = string.Empty;
 
         [Required]

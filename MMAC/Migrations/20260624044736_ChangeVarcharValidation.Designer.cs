@@ -3,6 +3,7 @@ using System;
 using MMAC.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MMAC.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260624044736_ChangeVarcharValidation")]
+    partial class ChangeVarcharValidation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -144,12 +147,12 @@ namespace MMAC.Migrations
                     b.Property<DateTime>("LogTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("TravellerId")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("LogId");
 
-                    b.HasIndex("TravellerId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("AuditLogs");
                 });
@@ -535,7 +538,7 @@ namespace MMAC.Migrations
                 {
                     b.HasOne("MMAC.Models.Cores.Traveller", "Traveller")
                         .WithMany("AuditLogs")
-                        .HasForeignKey("TravellerId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
