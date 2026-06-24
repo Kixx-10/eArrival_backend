@@ -67,10 +67,10 @@ namespace MMAC.Validations
 
 
             RuleFor(x => x.VehicleNumber)
-                .MaximumLength(10).WithMessage("Vehicle Number cannot exceed 10 characters.");
+                .MaximumLength(20).WithMessage("Vehicle Number cannot exceed 10 characters.");
 
             RuleFor(x => x.VehicleName)
-                .MaximumLength(20).WithMessage("Vehicle Name cannot exceed 20 characters.");
+                .MaximumLength(50).WithMessage("Vehicle Name cannot exceed 20 characters.");
 
             RuleFor(x => x.Accommodation)
                 .MaximumLength(50).WithMessage("Accommodation info cannot exceed 20 characters.");
