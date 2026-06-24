@@ -114,6 +114,11 @@ namespace MMAC.Repositories
                 application.ApprovedDate = DateTime.UtcNow;
                 application.ApprovedUser = approveUser;
             }
+            else if (appStatus.Equals("Rejected", StringComparison.OrdinalIgnoreCase))
+            {
+                application.ApprovedDate = null;
+                application.ApprovedUser = null;
+            }
             else
             {
                 application.ApprovedDate = null;
