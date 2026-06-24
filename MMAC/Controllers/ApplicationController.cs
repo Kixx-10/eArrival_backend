@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
 using MMAC.DTOS;
+using MMAC.Models.Cores;
 using MMAC.Services.ArrivalInterface;
 using MMAC.Services.PdfService;
 
@@ -41,7 +42,7 @@ namespace MMAC.Controllers
 
                 if (!string.IsNullOrEmpty(model.Email))
                 {
-                    _pdfService.SendPdfEmailInBackground(model.Email, result.ApplicationNo.ToString(), pdfBytes);
+                    _pdfService.SendPdfEmailInBackground(model.Email, result.ApplicationNo.ToString(), pdfBytes,result.ReferenceNo,model.TravellerId);
                 }
 
                 string pdfBase64 = Convert.ToBase64String(pdfBytes);
@@ -67,6 +68,7 @@ namespace MMAC.Controllers
                 return StatusCode(500, new { message = "An error occurred during submission or PDF processing.", error = ex.Message });
             }
         }
+
 
         [HttpGet("SearchApplicationByQRCode{AppNo}")]
         public async Task<IActionResult> GetDetails(Guid AppNo)

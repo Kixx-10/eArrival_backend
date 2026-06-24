@@ -15,9 +15,9 @@ namespace MMAC.Models.Audits
         [Required]
         public DateTime LogTime { get; set; } = DateTime.UtcNow;
         [Required]
-        public Guid UserId { get; set; }
+        public Guid TravellerId { get; set; }
 
-        [ForeignKey("UserId")]
+        [ForeignKey("TravellerId")]
         public virtual Traveller? Traveller { get; set; }
 
 

@@ -2,6 +2,7 @@
 using MMAC.DTOS;
 using MMAC.Models.Cores;
 using MMAC.Repositories;
+using MMAC.Services.AuditLogService;
 
 namespace MMAC.Services.ArrivalInterface
 {
@@ -9,10 +10,12 @@ namespace MMAC.Services.ArrivalInterface
     {
         private readonly ICompleteArrivalRepository _repository;
         private readonly IMapper _mapper;
-        public CompleteArrivalService(ICompleteArrivalRepository repository, IMapper mapper)
+        private readonly IAuditLogService _auditLogService;
+        public CompleteArrivalService(ICompleteArrivalRepository repository, IMapper mapper,IAuditLogService auditLogService)
         {
             _repository = repository;
             _mapper = mapper;
+            _auditLogService = auditLogService;   
         }
 
         public async Task<ArrivalSubmitResponseDTO> SubmitAsync(CompleteArrivalDTO dto)
@@ -82,11 +85,21 @@ namespace MMAC.Services.ArrivalInterface
                 arrivalApplication.CreatedDate = DateTime.UtcNow;
                 Guid savedAppNo = await _repository.SubmitArrivalApplicationAsync(traveller, arrivalApplication);
 
+
+                if (!isUpdateFlow)
+                {
+                    currentTravellerId = traveller.TravellerId;
+                }
+
+                await _auditLogService.LogAsync( isUpdateFlow ? "UPDATE_ARRIVAL_FORM" : "CREATE_ARRIVAL_FORM", new { ReferenceNo = finalReferenceNo, AppNo = savedAppNo }, currentTravellerId );
+
                 return new ArrivalSubmitResponseDTO
                 {
                     ApplicationNo = savedAppNo,
                     ReferenceNo = arrivalApplication.ReferenceNo
                 };
+
+
             }
             catch (ArgumentException) { throw; }
             catch (KeyNotFoundException) { throw; }

@@ -9,6 +9,7 @@ using MMAC.Repositories;
 using MMAC.Repositories.DashboardRepository;
 using MMAC.Services;
 using MMAC.Services.ArrivalInterface;
+using MMAC.Services.AuditLogService;
 using MMAC.Services.DashboardService;
 using MMAC.Services.PdfService;
 using MMAC.Services.PortOfArrivalService;
@@ -50,7 +51,11 @@ builder.Services.AddScoped<IUtilityService, UtilityService>();
 
 builder.Services.AddScoped<ICountryService, CountryService>();
 
+
 builder.Services.AddScoped<IPdfService, PdfService>();
+builder.Services.AddScoped<IAuditLogService, AuditLogService>();
+builder.Services.AddHttpContextAccessor();
+
 
 
 builder.Services.AddEndpointsApiExplorer();
@@ -85,15 +90,18 @@ builder.Services.AddCors(options =>
                   .AllowAnyHeader();
         });
 });
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    //app.UseSwagger();
-    //app.UseSwaggerUI();
-    app.MapOpenApi();
-    app.MapScalarApiReference();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    //app.MapOpenApi();
+    //app.MapScalarApiReference();
 }
 app.UseCors("AllowAll");
 //app.UseHttpsRedirection();
