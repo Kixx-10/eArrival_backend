@@ -9,7 +9,7 @@ namespace MMAC.Validations
         public CompleteArrivalDTOValidator()
         {
             RuleFor(x => x.FullName).NotEmpty().WithMessage("Name is required")
-                .MaximumLength(50).WithMessage("Name cannot more 50 characters");
+                .MaximumLength(100).WithMessage("Name cannot more 50 characters");
 
             RuleFor(x => x.Gender).NotEmpty().WithMessage("Select your gender")
                 .MaximumLength(1).WithMessage("Select M or F");
@@ -70,7 +70,7 @@ namespace MMAC.Validations
                 .MaximumLength(10).WithMessage("Vehicle Number cannot exceed 10 characters.");
 
             RuleFor(x => x.VehicleName)
-                .MaximumLength(20).WithMessage("Vehicle Name cannot exceed 20 characters.");
+                .MaximumLength(50).WithMessage("Vehicle Name cannot exceed 20 characters.");
 
             RuleFor(x => x.Accommodation)
                 .MaximumLength(50).WithMessage("Accommodation info cannot exceed 20 characters.");
