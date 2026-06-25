@@ -78,6 +78,7 @@ namespace MMAC.Repositories
         {
             return await _context.ArrivalApplication
                 .Include(x => x.Traveller)
+                .ThenInclude(t => t!.CountryOfBirth)
                 .Include(x => x.selectedModeOfTravel)
                 .Include(x => x.selectedPortOfArrival)
                 .Include(x => x.Township)

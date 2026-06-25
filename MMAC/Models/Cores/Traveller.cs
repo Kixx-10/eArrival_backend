@@ -64,6 +64,8 @@ namespace MMAC.Models.Cores
         [MaxLength(3)]
         [Column(TypeName = "varchar(3)")]
         public string IssuedCountryCode { get; set; } = string.Empty;
+        [ForeignKey("IssuedCountryCode")]
+        public virtual Country? IssuedCountry { get; set; }
 
         [Required]
         [Column(TypeName = "date")]
