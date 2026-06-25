@@ -11,11 +11,11 @@ namespace MMAC.Services.ArrivalInterface
         private readonly ICompleteArrivalRepository _repository;
         private readonly IMapper _mapper;
         private readonly IAuditLogService _auditLogService;
-        public CompleteArrivalService(ICompleteArrivalRepository repository, IMapper mapper,IAuditLogService auditLogService)
+        public CompleteArrivalService(ICompleteArrivalRepository repository, IMapper mapper, IAuditLogService auditLogService)
         {
             _repository = repository;
             _mapper = mapper;
-            _auditLogService = auditLogService;   
+            _auditLogService = auditLogService;
         }
 
         public async Task<ArrivalSubmitResponseDTO> SubmitAsync(CompleteArrivalDTO dto)
@@ -91,7 +91,7 @@ namespace MMAC.Services.ArrivalInterface
                     currentTravellerId = traveller.TravellerId;
                 }
 
-                await _auditLogService.LogAsync( isUpdateFlow ? "UPDATE_ARRIVAL_FORM" : "CREATE_ARRIVAL_FORM", new { ReferenceNo = finalReferenceNo, AppNo = savedAppNo }, currentTravellerId );
+                await _auditLogService.LogAsync(isUpdateFlow ? "UPDATE_ARRIVAL_FORM" : "CREATE_ARRIVAL_FORM", new { ReferenceNo = finalReferenceNo, AppNo = savedAppNo }, currentTravellerId);
 
                 return new ArrivalSubmitResponseDTO
                 {
@@ -125,6 +125,11 @@ namespace MMAC.Services.ArrivalInterface
                 if (app.AppStatus?.Equals("Invalid", StringComparison.OrdinalIgnoreCase) == true)
                 {
                     return null;
+                }
+
+                if (app.AppStatus?.Equals("Rejected", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    throw new InvalidOperationException("This Traveller has already been rejected.");
                 }
 
                 if (app.AppStatus?.Equals("Approved", StringComparison.OrdinalIgnoreCase) == true)
