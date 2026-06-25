@@ -144,6 +144,11 @@ namespace MMAC.Services.ArrivalInterface
                 if (app.selectedModeOfTravel != null) result.ModeOfTravelName = app.selectedModeOfTravel.ModeOfTravelName;
                 if (app.selectedPortOfArrival != null) result.PortOfArrivalName = app.selectedPortOfArrival.PortOfArrivalName;
 
+                if (app.Traveller != null && app.Traveller.CountryOfBirth != null)
+                {
+                    result.Name = app.Traveller.CountryOfBirth.Name;
+                }
+
                 if (app.Township != null)
                 {
                     result.TownshipName = app.Township.Name;
