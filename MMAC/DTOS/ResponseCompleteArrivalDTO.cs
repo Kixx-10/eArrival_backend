@@ -7,7 +7,9 @@
         public string FullName { get; set; } = string.Empty;
         public string Gender { get; set; } = string.Empty;
         public DateTime DOB { get; set; }
-        public string CountryOfBirthCode { get; set; } = string.Empty;
+
+        //public string CountryOfBirthCode { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string MobileNumber { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
