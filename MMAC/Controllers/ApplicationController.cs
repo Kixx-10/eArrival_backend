@@ -1,7 +1,7 @@
 ﻿
+using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using MMAC.DTOS;
-using MMAC.Models.Cores;
 using MMAC.Services.ArrivalInterface;
 using MMAC.Services.PdfService;
 
@@ -32,6 +32,8 @@ namespace MMAC.Controllers
             try
             {
                 var result = await _completeArrival.SubmitAsync(model);
+                BackgroundJob.Schedule<ICompleteArrivalService>(service => service.AutoExpireApplicationAsync(result.ApplicationNo),
+                TimeSpan.FromMinutes(3));
 
                 if (result.ApplicationNo == Guid.Empty)
                 {
@@ -42,7 +44,7 @@ namespace MMAC.Controllers
 
                 if (!string.IsNullOrEmpty(model.Email))
                 {
-                    _pdfService.SendPdfEmailInBackground(model.Email, result.ApplicationNo.ToString(), pdfBytes,result.ReferenceNo,model.TravellerId);
+                    _pdfService.SendPdfEmailInBackground(model.Email, result.ApplicationNo.ToString(), pdfBytes, result.ReferenceNo, model.TravellerId);
                 }
 
                 string pdfBase64 = Convert.ToBase64String(pdfBytes);

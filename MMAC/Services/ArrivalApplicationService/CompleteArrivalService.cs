@@ -126,6 +126,10 @@ namespace MMAC.Services.ArrivalInterface
                 {
                     return null;
                 }
+                if (app.AppStatus?.Equals("Expired", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    throw new InvalidOperationException("This Arrival card is Expired.");
+                }
 
                 if (app.AppStatus?.Equals("Rejected", StringComparison.OrdinalIgnoreCase) == true)
                 {
@@ -169,7 +173,17 @@ namespace MMAC.Services.ArrivalInterface
                 throw;
             }
         }
+        //To check hangfire Expire date
+        public async Task AutoExpireApplicationAsync(Guid appNo)
+        {
+            var app = await _repository.GetArrivalApplicationDetailsAsync(appNo);
 
+            if (app != null && app.AppStatus == "Submitted")
+            {
+                await _repository.ApproveApplicationAsync(appNo, "Expired", "System-Auto-Expire");
+            }
+        }
+        //
         public async Task<bool> ApproveApplication(Guid AppNo, string AppStatus, string ApproveUser)
         {
             try
