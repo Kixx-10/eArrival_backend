@@ -89,7 +89,7 @@ namespace MMAC.Validations
                 .MaximumLength(11).WithMessage("Myanmar Mobile Number cannot exceed 20 characters.");
 
             RuleFor(x => x.PreviousCity)
-                .MaximumLength(20).WithMessage("Previous City cannot exceed 20 characters.");
+                .MaximumLength(50).WithMessage("Previous City cannot exceed 20 characters.");
 
             RuleFor(x => x.HealthDeclaration)
                 .MaximumLength(100).WithMessage("Health Declaration info cannot exceed 100 characters.");

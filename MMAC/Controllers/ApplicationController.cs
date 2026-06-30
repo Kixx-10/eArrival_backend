@@ -138,6 +138,5 @@ namespace MMAC.Controllers
                 return StatusCode(500, new { message = "An error occurred while updating the application status.", error = ex.Message });
             }
         }
-
     }
 }
