@@ -11,11 +11,11 @@ namespace MMAC.Services.ArrivalInterface
         private readonly ICompleteArrivalRepository _repository;
         private readonly IMapper _mapper;
         private readonly IAuditLogService _auditLogService;
-        public CompleteArrivalService(ICompleteArrivalRepository repository, IMapper mapper,IAuditLogService auditLogService)
+        public CompleteArrivalService(ICompleteArrivalRepository repository, IMapper mapper, IAuditLogService auditLogService)
         {
             _repository = repository;
             _mapper = mapper;
-            _auditLogService = auditLogService;   
+            _auditLogService = auditLogService;
         }
 
         public async Task<ArrivalSubmitResponseDTO> SubmitAsync(CompleteArrivalDTO dto)
@@ -91,7 +91,7 @@ namespace MMAC.Services.ArrivalInterface
                     currentTravellerId = traveller.TravellerId;
                 }
 
-                await _auditLogService.LogAsync( isUpdateFlow ? "UPDATE_ARRIVAL_FORM" : "CREATE_ARRIVAL_FORM", new { ReferenceNo = finalReferenceNo, AppNo = savedAppNo }, currentTravellerId );
+                await _auditLogService.LogAsync(isUpdateFlow ? "UPDATE_ARRIVAL_FORM" : "CREATE_ARRIVAL_FORM", new { ReferenceNo = finalReferenceNo, AppNo = savedAppNo }, currentTravellerId);
 
                 return new ArrivalSubmitResponseDTO
                 {
@@ -126,6 +126,15 @@ namespace MMAC.Services.ArrivalInterface
                 {
                     return null;
                 }
+                if (app.AppStatus?.Equals("Expired", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    throw new InvalidOperationException("This Arrival card is Expired.");
+                }
+
+                if (app.AppStatus?.Equals("Rejected", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    throw new InvalidOperationException("This Traveller has already been rejected.");
+                }
 
                 if (app.AppStatus?.Equals("Approved", StringComparison.OrdinalIgnoreCase) == true)
                 {
@@ -138,6 +147,11 @@ namespace MMAC.Services.ArrivalInterface
                 if (app.Traveller != null) _mapper.Map(app.Traveller, result);
                 if (app.selectedModeOfTravel != null) result.ModeOfTravelName = app.selectedModeOfTravel.ModeOfTravelName;
                 if (app.selectedPortOfArrival != null) result.PortOfArrivalName = app.selectedPortOfArrival.PortOfArrivalName;
+
+                if (app.Traveller != null && app.Traveller.CountryOfBirth != null)
+                {
+                    result.Name = app.Traveller.CountryOfBirth.Name;
+                }
 
                 if (app.Township != null)
                 {
@@ -159,7 +173,17 @@ namespace MMAC.Services.ArrivalInterface
                 throw;
             }
         }
+        //To check hangfire Expire date
+        public async Task AutoExpireApplicationAsync(Guid appNo)
+        {
+            var app = await _repository.GetArrivalApplicationDetailsAsync(appNo);
 
+            if (app != null && app.AppStatus == "Submitted")
+            {
+                await _repository.ApproveApplicationAsync(appNo, "Expired", "System-Auto-Expire");
+            }
+        }
+        //
         public async Task<bool> ApproveApplication(Guid AppNo, string AppStatus, string ApproveUser)
         {
             try

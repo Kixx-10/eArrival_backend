@@ -78,6 +78,7 @@ namespace MMAC.Repositories
         {
             return await _context.ArrivalApplication
                 .Include(x => x.Traveller)
+                .ThenInclude(t => t!.CountryOfBirth)
                 .Include(x => x.selectedModeOfTravel)
                 .Include(x => x.selectedPortOfArrival)
                 .Include(x => x.Township)
@@ -113,6 +114,11 @@ namespace MMAC.Repositories
             {
                 application.ApprovedDate = DateTime.UtcNow;
                 application.ApprovedUser = approveUser;
+            }
+            else if (appStatus.Equals("Rejected", StringComparison.OrdinalIgnoreCase))
+            {
+                application.ApprovedDate = null;
+                application.ApprovedUser = null;
             }
             else
             {

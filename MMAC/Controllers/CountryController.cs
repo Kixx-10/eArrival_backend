@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MMAC.Interfaces;
-using MMAC.Models.Master;
 
 namespace MMAC.Controllers
 {
@@ -10,10 +9,12 @@ namespace MMAC.Controllers
     {
         private readonly ICountryService _countryService;
 
+
         // 1. Dependency Injection pulls in your ICountryService effortlessly!
         public CountryController(ICountryService countryService)
         {
             _countryService = countryService;
+
         }
 
         // 2. Endpoint for: GET api/country
