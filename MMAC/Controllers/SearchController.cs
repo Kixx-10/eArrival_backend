@@ -30,7 +30,6 @@ namespace MMAC.Controllers
 
             try
             {
-                // Service Layer ထံမှတစ်ဆင့် ၅ ချက်လုံးကို တိုက်စစ်ပြီး ဒေတာဆွဲထုတ်ခြင်း
                 ResponseForeignerArrivalDTO foreignerData = await _foreignerSearchService.SearchForeignerDetailsAsync(requestDto);
                 return Ok(new
                 {
