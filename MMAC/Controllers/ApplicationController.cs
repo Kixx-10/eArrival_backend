@@ -32,8 +32,10 @@ namespace MMAC.Controllers
             try
             {
                 var result = await _completeArrival.SubmitAsync(model);
-                BackgroundJob.Schedule<ICompleteArrivalService>(service => service.AutoExpireApplicationAsync(result.ApplicationNo),
-                TimeSpan.FromMinutes(3));
+                BackgroundJob.Schedule<ICompleteArrivalService>(
+                    service => service.AutoExpireApplicationAsync(result.ApplicationNo),
+                    TimeSpan.FromMinutes(3)
+                );
 
                 if (result.ApplicationNo == Guid.Empty)
                 {
@@ -41,13 +43,8 @@ namespace MMAC.Controllers
                 }
 
                 byte[] pdfBytes = await _pdfService.GenerateArrivalPdfAsync(model, result.ApplicationNo, result.ReferenceNo);
-
-                if (!string.IsNullOrEmpty(model.Email))
-                {
-                    _pdfService.SendPdfEmailInBackground(model.Email, result.ApplicationNo.ToString(), pdfBytes, result.ReferenceNo, model.TravellerId);
-                }
-
                 string pdfBase64 = Convert.ToBase64String(pdfBytes);
+
 
                 return Ok(new
                 {
@@ -68,6 +65,44 @@ namespace MMAC.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred during submission or PDF processing.", error = ex.Message });
+            }
+        }
+        
+        [HttpPost("SendApplicationEmail")]
+        public async Task<IActionResult> SendEmail([FromBody] SendEmailRequestDTO request)
+        {
+            if (request == null || request.Model == null)
+            {
+                return BadRequest(new { message = "Invalid request data." });
+            }
+
+            string emailToSend = !string.IsNullOrEmpty(request.TargetEmail) ? request.TargetEmail : request.Model.Email;
+
+            if (string.IsNullOrEmpty(emailToSend))
+            {
+                return BadRequest(new { message = "Recipient email address is required." });
+            }
+
+            if (request.ApplicationNo == Guid.Empty || string.IsNullOrEmpty(request.ReferenceNo))
+            {
+                return BadRequest(new { message = "ApplicationNo and ReferenceNo are required." });
+            }
+
+            try
+            {
+                byte[] pdfBytes = await _pdfService.GenerateArrivalPdfAsync(request.Model, request.ApplicationNo, request.ReferenceNo);
+
+                _pdfService.SendPdfEmailInBackground(emailToSend, request.ApplicationNo.ToString(), pdfBytes, request.ReferenceNo, request.Model.TravellerId);
+
+                return Ok(new
+                {
+                    message = $"PDF email submission initiated successfully for {emailToSend}",
+                    status = "Success"
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while sending the email.", error = ex.Message });
             }
         }
 
