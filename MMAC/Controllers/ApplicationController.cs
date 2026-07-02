@@ -33,7 +33,8 @@ namespace MMAC.Controllers
             {
                 var result = await _completeArrival.SubmitAsync(model);
                 BackgroundJob.Schedule<ICompleteArrivalService>(service => service.AutoExpireApplicationAsync(result.ApplicationNo),
-                TimeSpan.FromMinutes(10));
+                TimeSpan.FromMinutes(15)
+                );
 
                 if (result.ApplicationNo == Guid.Empty)
                 {
