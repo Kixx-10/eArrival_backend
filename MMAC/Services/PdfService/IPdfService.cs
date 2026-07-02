@@ -4,7 +4,7 @@ namespace MMAC.Services.PdfService
 {
     public interface IPdfService
     {
-        Task<byte[]> GenerateArrivalPdfAsync(CompleteArrivalDTO model, Guid applicationNo, string referenceNo);
+        Task<byte[]> GenerateArrivalPdfAsync(CompleteArrivalDTO model, Guid applicationNo, string referenceNo, string countryName, string fullAddress);
         void SendPdfEmailInBackground(string toEmail, string applicationId, byte[] pdfBytes, string referenceNo,Guid travellerId);
     }
 }

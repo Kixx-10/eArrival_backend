@@ -1,6 +1,8 @@
 ﻿
 using Hangfire;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MMAC.Data;
 using MMAC.DTOS;
 using MMAC.Services.ArrivalInterface;
 using MMAC.Services.PdfService;
@@ -13,12 +15,14 @@ namespace MMAC.Controllers
     {
         private readonly ICompleteArrivalService _completeArrival;
         private readonly IPdfService _pdfService;
+        private readonly AppDbContext _context;
 
-        public ApplicationController(ICompleteArrivalService completeArrival, IPdfService pdfService)
+        public ApplicationController(ICompleteArrivalService completeArrival, IPdfService pdfService, AppDbContext context)
 
         {
             _completeArrival = completeArrival;
             _pdfService = pdfService;
+            _context = context;
         }
 
         [HttpPost("Submit&UpdateApplication")]
@@ -42,9 +46,29 @@ namespace MMAC.Controllers
                     return BadRequest(new { message = "Failed to Submit ArrivalApplication" });
                 }
 
-                byte[] pdfBytes = await _pdfService.GenerateArrivalPdfAsync(model, result.ApplicationNo, result.ReferenceNo);
-                string pdfBase64 = Convert.ToBase64String(pdfBytes);
+                // 💡 ၁။ Database မှ Master Data (Country နှင့် Address Text များ) ကို ဆွဲထုတ်ခြင်း
+                var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryCode == model.CountryOfBirthCode);
+                string countryName = country?.Name ?? model.CountryOfBirthCode; // မရှိခဲ့လျှင် Code ကိုသာပြမည်
 
+                // Township မှတစ်ဆင့် District နှင့် StateRegion ကို Include သုံးပြီး တစ်ကြိမ်တည်း ဆွဲထုတ်ပါသည် (Performance ကောင်းစေရန်)
+                var township = await _context.Township
+                    .Include(t => t.District)
+                        .ThenInclude(d => d.StateRegion)
+                    .FirstOrDefaultAsync(t => t.Id == model.TownshipId);
+
+                // 💡 ၂။ Address In Myanmar တည်ဆောက်ခြင်း (Address + Township + District + State/Region)
+                var addressParts = new List<string>();
+                if (!string.IsNullOrWhiteSpace(model.AddressInMyanmar)) addressParts.Add(model.AddressInMyanmar);
+                if (township != null) addressParts.Add(township.Name);
+                if (township?.District != null) addressParts.Add(township.District.Name);
+                if (township?.District?.StateRegion != null) addressParts.Add(township.District.StateRegion.Name);
+
+                string fullAddress = string.Join(", ", addressParts);
+                if (string.IsNullOrWhiteSpace(fullAddress)) fullAddress = "N/A";
+
+                // 💡 ၃။ ပြင်ဆင်ထားသော Parameter အသစ်များဖြင့် လှမ်းခေါ်ခြင်း
+                byte[] pdfBytes = await _pdfService.GenerateArrivalPdfAsync(model, result.ApplicationNo, result.ReferenceNo, countryName, fullAddress);
+                string pdfBase64 = Convert.ToBase64String(pdfBytes);
 
                 return Ok(new
                 {
@@ -53,14 +77,6 @@ namespace MMAC.Controllers
                     referenceNo = result.ReferenceNo ?? "N/A",
                     pdfData = pdfBase64
                 });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { message = ex.Message });
             }
             catch (Exception ex)
             {
@@ -90,7 +106,25 @@ namespace MMAC.Controllers
 
             try
             {
-                byte[] pdfBytes = await _pdfService.GenerateArrivalPdfAsync(request.Model, request.ApplicationNo, request.ReferenceNo);
+                var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryCode == request.Model.CountryOfBirthCode);
+                string countryName = country?.Name ?? request.Model.CountryOfBirthCode;
+
+                var township = await _context.Township
+                    .Include(t => t.District)
+                        .ThenInclude(d => d.StateRegion)
+                    .FirstOrDefaultAsync(t => t.Id == request.Model.TownshipId);
+
+                var addressParts = new List<string>();
+                if (!string.IsNullOrWhiteSpace(request.Model.AddressInMyanmar)) addressParts.Add(request.Model.AddressInMyanmar);
+                if (township != null) addressParts.Add(township.Name);
+                if (township?.District != null) addressParts.Add(township.District.Name);
+                if (township?.District?.StateRegion != null) addressParts.Add(township.District.StateRegion.Name);
+
+                string fullAddress = string.Join(", ", addressParts);
+                if (string.IsNullOrWhiteSpace(fullAddress)) fullAddress = "N/A";
+
+                // PDF ထုတ်လုပ်ခြင်း
+                byte[] pdfBytes = await _pdfService.GenerateArrivalPdfAsync(request.Model, request.ApplicationNo, request.ReferenceNo, countryName, fullAddress);
 
                 _pdfService.SendPdfEmailInBackground(emailToSend, request.ApplicationNo.ToString(), pdfBytes, request.ReferenceNo, request.Model.TravellerId);
 
@@ -105,7 +139,6 @@ namespace MMAC.Controllers
                 return StatusCode(500, new { message = "An error occurred while sending the email.", error = ex.Message });
             }
         }
-
 
         [HttpGet("SearchApplicationByQRCode{AppNo}")]
         public async Task<IActionResult> GetDetails(Guid AppNo)

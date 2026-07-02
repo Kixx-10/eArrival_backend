@@ -31,7 +31,7 @@ namespace MMAC.Services.PdfService
             _scopeFactory = scopeFactory;
         }
 
-        public async Task<byte[]> GenerateArrivalPdfAsync(CompleteArrivalDTO model, Guid applicationNo, string referenceNo)
+        public async Task<byte[]> GenerateArrivalPdfAsync(CompleteArrivalDTO model, Guid applicationNo, string referenceNo, string countryName, string fullAddress)
         {
             return await Task.Run(() =>
             {
@@ -51,7 +51,7 @@ namespace MMAC.Services.PdfService
 
                 PdfBrush blackBrush = PdfBrushes.Black;
                 PdfBrush grayBrush = PdfBrushes.DimGray;
-                PdfBrush lightGrayBrush = new PdfSolidBrush(Color.FromArgb(245, 247, 250)); // Light background for headers
+                PdfBrush lightGrayBrush = new PdfSolidBrush(Color.FromArgb(245, 247, 250));
 
                 float currentY = 15f;
                 float pageWidth = page.Canvas.ClientSize.Width;
@@ -89,12 +89,20 @@ namespace MMAC.Services.PdfService
                 page.Canvas.DrawString("PART I: Personal Particulars", sectionFont, themeBrush, 18, currentY + 4);
                 currentY += 32f;
 
+                // Gender Mapping (M = Male, F = Female)
+                string formattedGender = model.Gender?.ToUpper() switch
+                {
+                    "M" => "Male",
+                    "F" => "Female",
+                    _ => model.Gender ?? "N/A"
+                };
+
                 DrawField(page, "FULL NAME", model.FullName, labelFont, valueFont, 10, currentY);
                 DrawField(page, "PASSPORT NUMBER", model.PassportNo, labelFont, valueFont, pageWidth / 2, currentY);
                 currentY += 38f;
 
-                DrawField(page, "NATIONALITY", model.CountryOfBirthCode, labelFont, valueFont, 10, currentY);
-                DrawField(page, "GENDER", model.Gender, labelFont, valueFont, pageWidth / 2, currentY);
+                DrawField(page, "COUNTRY", countryName, labelFont, valueFont, 10, currentY);
+                DrawField(page, "GENDER", formattedGender, labelFont, valueFont, pageWidth / 2, currentY);
                 currentY += 38f;
 
                 DrawField(page, "MOBILE NUMBER", model.MobileNumber, labelFont, valueFont, 10, currentY);
@@ -109,7 +117,7 @@ namespace MMAC.Services.PdfService
                 DrawField(page, "PURPOSE OF VISIT", model.PurposeOfVisit, labelFont, valueFont, pageWidth / 2, currentY);
                 currentY += 38f;
 
-                DrawField(page, "ADDRESS IN DESTINATION", model.AddressInMyanmar, labelFont, valueFont, 10, currentY);
+                DrawField(page, "ADDRESS IN MYANMAR", fullAddress, labelFont, valueFont, 10, currentY);
                 currentY += 52f;
 
                 // --- PART III: Health & Customs Declaration ---
@@ -147,7 +155,6 @@ namespace MMAC.Services.PdfService
                 return outputStream.ToArray();
             });
         }
-
         private void DrawField(PdfPageBase page, string label, string value, PdfFont labelFont, PdfFont valueFont, float x, float y)
         {
             page.Canvas.DrawString(label, labelFont, new PdfSolidBrush(Color.Gray), x, y);
