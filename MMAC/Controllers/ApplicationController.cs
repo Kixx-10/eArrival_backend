@@ -32,9 +32,9 @@ namespace MMAC.Controllers
             try
             {
                 var result = await _completeArrival.SubmitAsync(model);
-                BackgroundJob.Schedule<ICompleteArrivalService>(
-                    service => service.AutoExpireApplicationAsync(result.ApplicationNo),
-                    TimeSpan.FromMinutes(3)
+
+                BackgroundJob.Schedule<ICompleteArrivalService>(service => service.AutoExpireApplicationAsync(result.ApplicationNo),
+                TimeSpan.FromMinutes(15)
                 );
 
                 if (result.ApplicationNo == Guid.Empty)
@@ -67,7 +67,7 @@ namespace MMAC.Controllers
                 return StatusCode(500, new { message = "An error occurred during submission or PDF processing.", error = ex.Message });
             }
         }
-        
+
         [HttpPost("SendApplicationEmail")]
         public async Task<IActionResult> SendEmail([FromBody] SendEmailRequestDTO request)
         {
