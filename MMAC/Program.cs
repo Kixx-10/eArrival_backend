@@ -88,10 +88,10 @@ if (app.Environment.IsDevelopment())
 }
 app.UseRouting();
 app.UseCors("AllowAll");
-app.UseWhen(
-    context => !context.Request.Path.StartsWithSegments("/hangfire"),
-    appBuilder => appBuilder.UseMiddleware<ApiKeyMiddleware>()
-);
+//app.UseWhen(
+//    context => !context.Request.Path.StartsWithSegments("/hangfire"),
+//    appBuilder => appBuilder.UseMiddleware<ApiKeyMiddleware>()
+//);
 
 app.UseAuthorization();
 
