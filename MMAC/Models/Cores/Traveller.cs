@@ -12,7 +12,7 @@ namespace MMAC.Models.Cores
         public Guid TravellerId { get; set; } = Guid.NewGuid();
 
         [Required]
-        [MaxLength(50)]
+        [MaxLength(30)]
         public string FullName { get; set; } = string.Empty;
 
         [Required]
@@ -26,15 +26,28 @@ namespace MMAC.Models.Cores
         [Required]
         [MaxLength(3)]
         [Column(TypeName = "varchar(3)")]
-        public string CountryOfBirthCode { get; set; } = string.Empty;
+        public string NationalityCode { get; set; } = string.Empty;
 
-        [ForeignKey("CountryOfBirthCode")]
-        public virtual Country? CountryOfBirth { get; set; }
+        [ForeignKey("NationalityCode")]
+        public virtual Country? Nationality { get; set; }
+
+        [Required]
+        [MaxLength(3)]
+        [Column(TypeName = "varchar(3)")]
+        public string PlaceOfBirthCode { get; set; } = string.Empty;
+
+        [ForeignKey("PlaceOfBirthCode")]
+        public virtual Country? PlaceOfBirth { get; set; }
 
         [Required]
         [MaxLength(30)]
         [Column(TypeName = "varchar(30)")]
         public string Email { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(30)]
+        [Column(TypeName = "varchar(30)")]
+        public string Occupation { get; set; } = string.Empty;
 
         [Required]
         [MaxLength(20)]
@@ -51,6 +64,9 @@ namespace MMAC.Models.Cores
         [MaxLength(30)]
         public string? NRC { get; set; }
 
+        [MaxLength(10)]
+        public string? UID { get; set; }
+
 
         [MaxLength(50)]
         public string? FatherName { get; set; }
@@ -64,6 +80,8 @@ namespace MMAC.Models.Cores
         [MaxLength(3)]
         [Column(TypeName = "varchar(3)")]
         public string IssuedCountryCode { get; set; } = string.Empty;
+        [ForeignKey("IssuedCountryCode")]
+        public virtual Country? IssuedCountry { get; set; }
 
         [Required]
         [Column(TypeName = "date")]

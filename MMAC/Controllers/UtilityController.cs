@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MMAC.DTOS;
 using MMAC.Services.UtilityService;
@@ -19,6 +19,7 @@ namespace MMAC.Controllers
         }
 
         [HttpGet("Getlocations")]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<LocationDTO>>> GetLocations()
         {
             try
@@ -34,6 +35,7 @@ namespace MMAC.Controllers
         }
 
         [HttpGet("GetNRCFormat")]
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<NrcDTO>>> GetNrcFormat()
         {
             try
@@ -47,8 +49,7 @@ namespace MMAC.Controllers
             }
         }
     }
-}       
+}
 
-         
-          
-   
+
+

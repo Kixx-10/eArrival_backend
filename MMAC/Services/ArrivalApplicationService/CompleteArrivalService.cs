@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using Hangfire;
 using MMAC.DTOS;
 using MMAC.Models.Cores;
 using MMAC.Repositories;
 using MMAC.Services.AuditLogService;
+using MMAC.Services.TokenService;
 
 namespace MMAC.Services.ArrivalInterface
 {
@@ -11,18 +13,24 @@ namespace MMAC.Services.ArrivalInterface
         private readonly ICompleteArrivalRepository _repository;
         private readonly IMapper _mapper;
         private readonly IAuditLogService _auditLogService;
-        public CompleteArrivalService(ICompleteArrivalRepository repository, IMapper mapper, IAuditLogService auditLogService)
+        private readonly ITokenService _tokenService;
+        public CompleteArrivalService(
+            ICompleteArrivalRepository repository,
+            IMapper mapper, IAuditLogService auditLogService,
+            ITokenService tokenService
+            )
         {
             _repository = repository;
             _mapper = mapper;
             _auditLogService = auditLogService;
+            _tokenService = tokenService;
         }
 
         public async Task<ArrivalSubmitResponseDTO> SubmitAsync(CompleteArrivalDTO dto)
         {
             try
             {
-                if (dto.CountryOfBirthCode == "MMR")
+                if (dto.NationalityCode == "MMR")
                 {
                     if (string.IsNullOrWhiteSpace(dto.NRC) || string.IsNullOrWhiteSpace(dto.FatherName))
                     {
@@ -69,7 +77,7 @@ namespace MMAC.Services.ArrivalInterface
                     traveller.TravellerId = Guid.Empty;
 
                     // new generate Reference No 
-                    string currentYear = DateTime.Now.Year.ToString();
+                    string currentYear = DateTime.UtcNow.Year.ToString();
                     bool isDuplicate = true;
 
                     while (isDuplicate)
@@ -84,19 +92,30 @@ namespace MMAC.Services.ArrivalInterface
                 arrivalApplication.AppStatus = "Submitted";
                 arrivalApplication.CreatedDate = DateTime.UtcNow;
                 Guid savedAppNo = await _repository.SubmitArrivalApplicationAsync(traveller, arrivalApplication);
+                //for arrivaldate checking expire
+                var expiryTime = dto.ArrivalDate.AddDays(1).AddHours(1);
+                var delay = expiryTime - DateTime.UtcNow;
+                if (delay > TimeSpan.Zero)
+                {
+                    BackgroundJob.Schedule<ICompleteArrivalService>(
+                        service => service.AutoExpireApplicationAsync(savedAppNo),
+                        delay
+                    );
+                }
 
-
+                var token = await _tokenService.CreateToken(traveller.TravellerId);
                 if (!isUpdateFlow)
                 {
                     currentTravellerId = traveller.TravellerId;
                 }
 
-                await _auditLogService.LogAsync(isUpdateFlow ? "UPDATE_ARRIVAL_FORM" : "CREATE_ARRIVAL_FORM", new { ReferenceNo = finalReferenceNo, AppNo = savedAppNo }, currentTravellerId);
+                await _auditLogService.LogAsync(isUpdateFlow ? "UPDATE_ARRIVAL_FORM" : "CREATE_ARRIVAL_FORM", new { ReferenceNo = finalReferenceNo, AppNo = savedAppNo }, currentTravellerId);//old currentTravellerId
 
                 return new ArrivalSubmitResponseDTO
                 {
                     ApplicationNo = savedAppNo,
-                    ReferenceNo = arrivalApplication.ReferenceNo
+                    ReferenceNo = arrivalApplication.ReferenceNo,
+                    Token = token
                 };
 
 
@@ -108,6 +127,8 @@ namespace MMAC.Services.ArrivalInterface
             {
                 Console.WriteLine($"Error in SubmitAsync: {ex.Message}");
                 throw;
+                //var innerMessage = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                //throw new Exception($"Database Error: {innerMessage}");
             }
         }
 
@@ -148,9 +169,9 @@ namespace MMAC.Services.ArrivalInterface
                 if (app.selectedModeOfTravel != null) result.ModeOfTravelName = app.selectedModeOfTravel.ModeOfTravelName;
                 if (app.selectedPortOfArrival != null) result.PortOfArrivalName = app.selectedPortOfArrival.PortOfArrivalName;
 
-                if (app.Traveller != null && app.Traveller.CountryOfBirth != null)
+                if (app.Traveller != null && app.Traveller.Nationality != null)
                 {
-                    result.Name = app.Traveller.CountryOfBirth.Name;
+                    result.Name = app.Traveller.Nationality.Name;
                 }
 
                 if (app.Township != null)
@@ -178,7 +199,7 @@ namespace MMAC.Services.ArrivalInterface
         {
             var app = await _repository.GetArrivalApplicationDetailsAsync(appNo);
 
-            if (app != null && app.AppStatus == "Submitted")
+            if (app != null && app.AppStatus == "Submitted" && app.ArrivalDate.Date < DateTime.UtcNow.Date)
             {
                 await _repository.ApproveApplicationAsync(appNo, "Expired", "System-Auto-Expire");
             }
@@ -198,4 +219,3 @@ namespace MMAC.Services.ArrivalInterface
         }
     }
 }
-

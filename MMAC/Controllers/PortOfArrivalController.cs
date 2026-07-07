@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MMAC.Services.PortOfArrivalService;
 
 namespace MMAC.Controllers
@@ -15,6 +16,7 @@ namespace MMAC.Controllers
         }
 
         [HttpGet("{modeOfTravelId}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetPortsByMode(int modeOfTravelId)
         {
             var ports = await _portOfArrivalService.GetPortsByModeOfTravelAsync(modeOfTravelId);

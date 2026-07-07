@@ -9,16 +9,18 @@ namespace MMAC.Validations
         public CompleteArrivalDTOValidator()
         {
             RuleFor(x => x.FullName).NotEmpty().WithMessage("Name is required")
-                .MaximumLength(50).WithMessage("Name cannot more 50 characters");
-
+                .MaximumLength(30).WithMessage("Name cannot more 50 characters");
             RuleFor(x => x.Gender).NotEmpty().WithMessage("Select your gender")
                 .MaximumLength(1).WithMessage("Select M or F");
 
             RuleFor(x => x.DOB).NotEmpty().WithMessage("DOB is required")
                 .LessThan(DateTime.Today).WithMessage("DOB must be in the past");
 
-            RuleFor(x => x.CountryOfBirthCode).NotEmpty().WithMessage("CountryOfBirthCode is required")
+            RuleFor(x => x.NationalityCode).NotEmpty().WithMessage("NationalltyCode is required")
                 .MaximumLength(3).WithMessage("Code maximum 3");
+
+            RuleFor(x => x.PlaceOfBirthCode).NotEmpty().WithMessage("PlaceOfBirthCode is required")
+              .MaximumLength(3).WithMessage("Code maximum 3");
 
             RuleFor(x => x.Email).NotEmpty().WithMessage("Email is required")
                 .MaximumLength(30).WithMessage("Email cannot more 30 characters")
@@ -53,7 +55,7 @@ namespace MMAC.Validations
                  .GreaterThan(x => x.IssuedDate).WithMessage("Expiry date must be after the Passport Issue Date.")
                  .Must(expiryDate => expiryDate >= DateTime.Today.AddMonths(6))
                  .WithMessage("This passport cannot be used because it has expired or has less than 6 months of validity remaining from today.")
-                 .When(x => x.CountryOfBirthCode != "MMR");
+                 .When(x => x.NationalityCode != "MMR");
             RuleFor(x => x.ArrivalDate)
                 .NotEmpty().WithMessage("Arrival Date is required.")
                 .GreaterThanOrEqualTo(DateTime.Today).WithMessage("Arrival Date cannot be in the past.");
@@ -69,8 +71,6 @@ namespace MMAC.Validations
             RuleFor(x => x.VehicleNumber)
                 .MaximumLength(20).WithMessage("Vehicle Number cannot exceed 10 characters.");
 
-            RuleFor(x => x.VehicleName)
-                .MaximumLength(50).WithMessage("Vehicle Name cannot exceed 20 characters.");
 
             RuleFor(x => x.Accommodation)
                 .MaximumLength(50).WithMessage("Accommodation info cannot exceed 20 characters.");

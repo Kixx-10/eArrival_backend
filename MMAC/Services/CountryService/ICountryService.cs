@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using MMAC.Models.Master;
+﻿using MMAC.Models.Master;
 
 namespace MMAC.Interfaces
 {
     public interface ICountryService
     {
-        Task<IEnumerable<Country>> GetAllCountriesAsync();
+        Task<IEnumerable<Country>> GetPassportIssuedCountryAsync();
+        Task<IEnumerable<Country>> GetNationalityCountryAsync();
 
 
         Task<Country?> GetCountryByCodeAsync(string code);

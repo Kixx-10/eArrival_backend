@@ -14,8 +14,9 @@
         public string MobileNumber { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
         public string VisaNo { get; set; } = string.Empty;
-        public string NRC { get; set; } = string.Empty;
-        public string FatherName { get; set; } = string.Empty;
+        public string? NRC { get; set; }
+        public string? FatherName { get; set; }
+        public string? UID { get; set; }
         public string PassportNo { get; set; } = string.Empty;
         public string IssuedCountryCode { get; set; } = string.Empty;
         public DateTime IssuedDate { get; set; }
@@ -24,13 +25,13 @@
         // Arrival Info
         public DateTime ArrivalDate { get; set; }
         public string? VehicleNumber { get; set; }
-        public string? VehicleName { get; set; }
         public string? Accommodation { get; set; }
-        public string AddressInMyanmar { get; set; } = string.Empty;
+        public string? AddressInMyanmar { get; set; }
         public string MobileNumberMM { get; set; } = string.Empty;
         public string PurposeOfVisit { get; set; } = string.Empty;
         public string? PreviousCity { get; set; }
         public string? HealthDeclaration { get; set; }
+        public string? HealthRecordUrl { get; set; }
         public string? DigitalDeclarations { get; set; }
 
         public string ModeOfTravelName { get; set; } = string.Empty;

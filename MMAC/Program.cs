@@ -3,10 +3,12 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Hangfire;
 using Hangfire.PostgreSql;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using MMAC.Data;
 using MMAC.Interfaces;
-using MMAC.Middleware;
 using MMAC.Profiles;
 using MMAC.Repositories;
 using MMAC.Repositories.DashboardRepository;
@@ -17,9 +19,11 @@ using MMAC.Services.DashboardService;
 using MMAC.Services.PdfService;
 using MMAC.Services.PortOfArrivalService;
 using MMAC.Services.SearchService;
+using MMAC.Services.TokenService;
 using MMAC.Services.UpdateService;
 using MMAC.Services.UtilityService;
 using MMAC.Validations;
+using System.Text;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,7 +41,7 @@ builder.Services.AddHangfire(config => config
         c.UseNpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection"))));
 builder.Services.AddHangfireServer();
 
-// ── Controllers 
+// ── Controllers
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -45,9 +49,31 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
 
-// ── Swagger 
+// ── Swagger with JWT 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "eArrival Information System", Version = "v1" });
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Enter JWT token: Bearer {token}",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "Bearer"
+    });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 // ── DI Services 
 builder.Services.AddScoped<IPortOfArrivalRepository, PortOfArrivalRepository>();
@@ -62,11 +88,11 @@ builder.Services.AddScoped<IUtilityService, UtilityService>();
 builder.Services.AddScoped<ICountryService, CountryService>();
 builder.Services.AddScoped<IPdfService, PdfService>();
 builder.Services.AddScoped<IAuditLogService, AuditLogService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddHttpContextAccessor();
 
 // ── AutoMapper 
-var mapperConfig = new MapperConfiguration(cfg =>
-    cfg.AddProfile<CompleteArrivalMapper>());
+var mapperConfig = new MapperConfiguration(cfg => cfg.AddProfile<CompleteArrivalMapper>());
 builder.Services.AddSingleton(mapperConfig.CreateMapper());
 
 // ── FluentValidation 
@@ -78,9 +104,38 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", policy =>
         policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
+// ── JWT Authentication
+var jwtKey = builder.Configuration["Jwt:Key"]
+    ?? throw new InvalidOperationException("JWT Key is missing in configuration");
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero, // no extra grace time
+    };
+});
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
-// ── Middleware Pipeline 
+// ── Middleware Pipeline (ORDER MATTERS) 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -93,13 +148,16 @@ app.UseCors("AllowAll");
 //    appBuilder => appBuilder.UseMiddleware<ApiKeyMiddleware>()
 //);
 
-app.UseAuthorization();
+app.UseCors("AllowAll");           //  CORS
+app.UseAuthentication();           //  Auth (read JWT)
+app.UseAuthorization();            //  Authorize (check claims)
 
-app.MapControllers();
+app.MapControllers();              // Controllers
 
+// 5. Hangfire dashboard — no auth in dev
 app.MapHangfireDashboard("/hangfire", new DashboardOptions
 {
-    Authorization = new[] { new Hangfire.Dashboard.LocalRequestsOnlyAuthorizationFilter() }
+    Authorization = new Hangfire.Dashboard.IDashboardAuthorizationFilter[] { }
 });
 
 app.Run();

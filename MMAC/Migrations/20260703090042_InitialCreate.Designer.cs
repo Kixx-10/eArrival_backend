@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MMAC.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260611071817_AddReferenceNoInArrivalApplication")]
-    partial class AddReferenceNoInArrivalApplication
+    [Migration("20260703090042_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -147,12 +147,12 @@ namespace MMAC.Migrations
                     b.Property<DateTime>("LogTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("TravellerId")
                         .HasColumnType("uuid");
 
                     b.HasKey("LogId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("TravellerId");
 
                     b.ToTable("AuditLogs");
                 });
@@ -164,12 +164,10 @@ namespace MMAC.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Accommodation")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("AddressInMyanmar")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -205,9 +203,8 @@ namespace MMAC.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("MobileNumberMM")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
+                        .HasMaxLength(11)
+                        .HasColumnType("varchar(11)");
 
                     b.Property<int>("ModeOfTravelId")
                         .HasColumnType("integer");
@@ -217,8 +214,8 @@ namespace MMAC.Migrations
 
                     b.Property<string>("PreviousCity")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("PurposeOfVisit")
                         .IsRequired()
@@ -242,15 +239,10 @@ namespace MMAC.Migrations
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("date");
 
-                    b.Property<string>("VehicleName")
+                    b.Property<string>("VehicleNumber")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
-
-                    b.Property<string>("VehicleNumber")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("varchar(10)");
 
                     b.HasKey("AppNo");
 
@@ -301,8 +293,8 @@ namespace MMAC.Migrations
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
 
                     b.Property<string>("Gender")
                         .IsRequired()
@@ -326,16 +318,22 @@ namespace MMAC.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("character varying(30)");
 
+                    b.Property<string>("Occupation")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
                     b.Property<string>("PassportNo")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
 
+                    b.Property<string>("UID")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("date");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
 
                     b.Property<string>("VisaNo")
                         .HasMaxLength(50)
@@ -356,7 +354,9 @@ namespace MMAC.Migrations
                         .HasColumnName("CountryISOAlpha3Code");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("date");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("date")
+                        .HasDefaultValueSql("CURRENT_DATE");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -367,6 +367,9 @@ namespace MMAC.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("date");
@@ -543,7 +546,7 @@ namespace MMAC.Migrations
                 {
                     b.HasOne("MMAC.Models.Cores.Traveller", "Traveller")
                         .WithMany("AuditLogs")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("TravellerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
