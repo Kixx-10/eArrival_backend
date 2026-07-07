@@ -14,24 +14,24 @@ namespace MMAC.Models.Audits
 
         [Required]
         public DateTime LogTime { get; set; } = DateTime.UtcNow;
+
+        // Traveller FK
         [Required]
         public Guid TravellerId { get; set; }
 
-        [ForeignKey("TravellerId")]
-        public virtual Traveller? Traveller { get; set; }
+        [ForeignKey(nameof(TravellerId))]
+        public Traveller? Traveller { get; set; }
 
-
-        [Required]
-        [MaxLength(20)]
+        [Required, MaxLength(20)]
         [Column(TypeName = "varchar(20)")]
         public string LogIPAddr { get; set; } = string.Empty;
 
-        [Required]
-        [MaxLength(50)]
+        [Required, MaxLength(50)]
         [Column(TypeName = "varchar(50)")]
         public string Activity { get; set; } = string.Empty;
 
         [MaxLength(500)]
         public string? Inputted { get; set; }
     }
+
 }

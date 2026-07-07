@@ -21,6 +21,7 @@ namespace MMAC.Data
 
         //Masters
         public DbSet<Country> Country { get; set; }
+
         public DbSet<PortOfArrival> PortOfArrival { get; set; }
         public DbSet<ModeOfTravel> ModeOfTravel { get; set; }
 
@@ -35,5 +36,47 @@ namespace MMAC.Data
 
         //For Audits
         public DbSet<AuditLogs> AuditLogs { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Country>()
+                .HasKey(c => c.CountryCode);
+
+            modelBuilder.Entity<Country>()
+                .Property(c => c.CreatedDate)
+                .HasDefaultValueSql("CURRENT_DATE");
+
+
+            modelBuilder.Entity<Country>()
+                .Property(c => c.Type)
+                .HasConversion<int>();
+
+            // ၄။ AuditLogs အတွက် Relationship 
+            modelBuilder.Entity<AuditLogs>()
+                .HasOne(a => a.Traveller)
+                .WithMany(t => t.AuditLogs)
+                .HasForeignKey(a => a.TravellerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Traveller>()
+        .HasOne(t => t.Nationality)
+        .WithMany(c => c.Travellers)
+        .HasForeignKey(t => t.NationalityCode)
+        .OnDelete(DeleteBehavior.Restrict);
+
+            // 2. PlaceOfBirth Relationship
+            modelBuilder.Entity<Traveller>()
+                .HasOne(t => t.PlaceOfBirth)
+                .WithMany()
+                .HasForeignKey(t => t.PlaceOfBirthCode)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // 3. IssuedCountry Relationship
+            modelBuilder.Entity<Traveller>()
+                .HasOne(t => t.IssuedCountry)
+                .WithMany()
+                .HasForeignKey(t => t.IssuedCountryCode)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
     }
 }

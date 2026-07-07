@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MMAC.DTOS;
 using MMAC.Services.SearchService;
 using MMAC.Services.UpdateService;
@@ -21,6 +22,7 @@ namespace MMAC.Controllers
         }
         //For Foreigner
         [HttpPost("foreignerDetails")]
+        [AllowAnonymous]
         public async Task<IActionResult> VerifyAndRetrieveForeigner([FromBody] ForeignerVerifyRequestDTO requestDto)
         {
             if (requestDto == null)
@@ -59,6 +61,7 @@ namespace MMAC.Controllers
         //For Myanmar
 
         [HttpPost("myanmarDetails")]
+        [AllowAnonymous]
         public async Task<IActionResult> VerifyAndRetrieveMyanmar([FromBody] MyanmarVerifyRequestDTO requestDto)
         {
             if (requestDto == null)

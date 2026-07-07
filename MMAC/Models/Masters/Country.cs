@@ -7,7 +7,6 @@ namespace MMAC.Models.Master
     [Table("Country")]
     public class Country
     {
-
         [Key]
         [Required]
         [MaxLength(3)]
@@ -23,6 +22,11 @@ namespace MMAC.Models.Master
         [MaxLength(100)]
         public string NameMM { get; set; } = string.Empty;
 
+        public enum CountryType { Nationality = 1, PassportIssued = 0 }
+
+        [Required]
+        public CountryType Type { get; set; }
+
         [Required]
         [Column(TypeName = "date")]
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow.Date;
@@ -30,8 +34,7 @@ namespace MMAC.Models.Master
         [Column(TypeName = "date")]
         public DateTime? UpdatedDate { get; set; } = DateTime.UtcNow.Date;
 
-
+        // Navigation property
         public virtual ICollection<Traveller> Travellers { get; set; } = new List<Traveller>();
-
     }
 }

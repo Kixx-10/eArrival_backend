@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MMAC.Interfaces;
 
 namespace MMAC.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")] // This turns your URL route into: /api/country
+    [Route("api/[controller]")]
     public class CountryController : ControllerBase
     {
         private readonly ICountryService _countryService;
@@ -17,16 +18,26 @@ namespace MMAC.Controllers
 
         }
 
-        // 2. Endpoint for: GET api/country
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
+
+        [HttpGet("PassportIssuedCountry")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetPassportIssuedCountry()
         {
-            var countries = await _countryService.GetAllCountriesAsync();
+            var countries = await _countryService.GetPassportIssuedCountryAsync();
+            return Ok(countries);
+        }
+
+        [HttpGet("NationalityCountry")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetNationalityCountry()
+        {
+            var countries = await _countryService.GetNationalityCountryAsync();
             return Ok(countries);
         }
 
         // 3. Endpoint for: GET api/country/{code}
         [HttpGet("{code}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetByCode(string code)
         {
             var country = await _countryService.GetCountryByCodeAsync(code);
