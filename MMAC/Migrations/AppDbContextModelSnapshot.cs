@@ -264,11 +264,6 @@ namespace MMAC.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("date");
 
@@ -334,6 +329,11 @@ namespace MMAC.Migrations
                         .HasMaxLength(3)
                         .HasColumnType("varchar(3)");
 
+                    b.Property<string>("PlaceOfResidenceCode")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("varchar(3)");
+
                     b.Property<string>("UID")
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
@@ -352,6 +352,8 @@ namespace MMAC.Migrations
                     b.HasIndex("NationalityCode");
 
                     b.HasIndex("PlaceOfBirthCode");
+
+                    b.HasIndex("PlaceOfResidenceCode");
 
                     b.ToTable("Traveller");
                 });
@@ -618,11 +620,19 @@ namespace MMAC.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("MMAC.Models.Master.Country", "PlaceOfResidence")
+                        .WithMany()
+                        .HasForeignKey("PlaceOfResidenceCode")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("IssuedCountry");
 
                     b.Navigation("Nationality");
 
                     b.Navigation("PlaceOfBirth");
+
+                    b.Navigation("PlaceOfResidence");
                 });
 
             modelBuilder.Entity("MMAC.Models.Master.PortOfArrival", b =>

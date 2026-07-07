@@ -55,8 +55,11 @@ namespace MMAC.Models.Cores
         public string MobileNumber { get; set; } = string.Empty;
 
         [Required]
-        [MaxLength(100)]
-        public string Address { get; set; } = string.Empty;
+        [MaxLength(3)]
+        [Column(TypeName = "varchar(3)")]
+        public string PlaceOfResidenceCode { get; set; } = string.Empty;
+        [ForeignKey("PlaceOfResidenceCode")]
+        public virtual Country? PlaceOfResidence { get; set; }
 
         [MaxLength(50)]
         public string? VisaNo { get; set; } = string.Empty;
