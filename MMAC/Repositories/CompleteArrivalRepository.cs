@@ -110,12 +110,12 @@ namespace MMAC.Repositories
             application.AppStatus = appStatus;
             application.UpdatedDate = DateTime.UtcNow;
 
-            if (appStatus.Equals("Approved", StringComparison.OrdinalIgnoreCase))
+            if (appStatus.Equals("Arrived", StringComparison.OrdinalIgnoreCase))
             {
                 application.ApprovedDate = DateTime.UtcNow;
                 application.ApprovedUser = approveUser;
             }
-            else if (appStatus.Equals("Rejected", StringComparison.OrdinalIgnoreCase))
+            else if (appStatus.Equals("Departed", StringComparison.OrdinalIgnoreCase))
             {
                 application.ApprovedDate = null;
                 application.ApprovedUser = null;
