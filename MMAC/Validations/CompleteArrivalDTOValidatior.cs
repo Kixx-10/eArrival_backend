@@ -26,11 +26,17 @@ namespace MMAC.Validations
                 .MaximumLength(30).WithMessage("Email cannot more 30 characters")
                 .EmailAddress().WithMessage("Invalid email address");
 
+            RuleFor(x => x.Occupation).NotEmpty().WithMessage("Occupation is required")
+                .MaximumLength(30).WithMessage("Occupation cannot more 30 characters");
+
+            RuleFor(x => x.UID)
+                .MaximumLength(10).WithMessage("UID cannot exceed 10 characters.");
+
             RuleFor(x => x.MobileNumber).NotEmpty().WithMessage("Moblie No is required")
                 .MaximumLength(20).WithMessage("Mobile No cannot more 20 characters");
 
-            RuleFor(x => x.Address).NotEmpty().WithMessage("Address is required")
-                .MaximumLength(100).WithMessage("Address cannot more 100 characters");
+            RuleFor(x => x.PlaceOfResidenceCode).NotEmpty().WithMessage("PlaceOfResidence is required")
+                .MaximumLength(3).WithMessage("PlaceOfResidenceCode cannot more 3 characters");
 
             RuleFor(x => x.NRC).MaximumLength(30).WithMessage("NRC cannot more 30 characters");
 

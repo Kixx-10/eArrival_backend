@@ -51,7 +51,7 @@ namespace MMAC.Data
                 .Property(c => c.Type)
                 .HasConversion<int>();
 
-            // ၄။ AuditLogs အတွက် Relationship 
+            // ၄။ AuditLogs  Relationship 
             modelBuilder.Entity<AuditLogs>()
                 .HasOne(a => a.Traveller)
                 .WithMany(t => t.AuditLogs)
@@ -64,14 +64,20 @@ namespace MMAC.Data
         .HasForeignKey(t => t.NationalityCode)
         .OnDelete(DeleteBehavior.Restrict);
 
-            // 2. PlaceOfBirth Relationship
+            //  PlaceOfBirth Relationship
             modelBuilder.Entity<Traveller>()
                 .HasOne(t => t.PlaceOfBirth)
                 .WithMany()
                 .HasForeignKey(t => t.PlaceOfBirthCode)
                 .OnDelete(DeleteBehavior.Restrict);
+            //Place of residence relationship
+            modelBuilder.Entity<Traveller>()
+                .HasOne(t => t.PlaceOfResidence)
+                .WithMany()
+                .HasForeignKey(t => t.PlaceOfResidenceCode)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // 3. IssuedCountry Relationship
+            //  IssuedCountry Relationship
             modelBuilder.Entity<Traveller>()
                 .HasOne(t => t.IssuedCountry)
                 .WithMany()

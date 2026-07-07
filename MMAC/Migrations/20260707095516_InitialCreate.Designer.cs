@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MMAC.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260703090042_InitialCreate")]
+    [Migration("20260707095516_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -202,6 +202,10 @@ namespace MMAC.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<string>("HealthRecordUrl")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
                     b.Property<string>("MobileNumberMM")
                         .HasMaxLength(11)
                         .HasColumnType("varchar(11)");
@@ -263,16 +267,6 @@ namespace MMAC.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("CountryOfBirthCode")
-                        .IsRequired()
-                        .HasMaxLength(3)
-                        .HasColumnType("varchar(3)");
-
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("date");
 
@@ -318,6 +312,11 @@ namespace MMAC.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("character varying(30)");
 
+                    b.Property<string>("NationalityCode")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("varchar(3)");
+
                     b.Property<string>("Occupation")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -327,6 +326,16 @@ namespace MMAC.Migrations
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
+
+                    b.Property<string>("PlaceOfBirthCode")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("varchar(3)");
+
+                    b.Property<string>("PlaceOfResidenceCode")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("varchar(3)");
 
                     b.Property<string>("UID")
                         .HasMaxLength(10)
@@ -341,7 +350,13 @@ namespace MMAC.Migrations
 
                     b.HasKey("TravellerId");
 
-                    b.HasIndex("CountryOfBirthCode");
+                    b.HasIndex("IssuedCountryCode");
+
+                    b.HasIndex("NationalityCode");
+
+                    b.HasIndex("PlaceOfBirthCode");
+
+                    b.HasIndex("PlaceOfResidenceCode");
 
                     b.ToTable("Traveller");
                 });
@@ -590,13 +605,37 @@ namespace MMAC.Migrations
 
             modelBuilder.Entity("MMAC.Models.Cores.Traveller", b =>
                 {
-                    b.HasOne("MMAC.Models.Master.Country", "CountryOfBirth")
-                        .WithMany("Travellers")
-                        .HasForeignKey("CountryOfBirthCode")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("MMAC.Models.Master.Country", "IssuedCountry")
+                        .WithMany()
+                        .HasForeignKey("IssuedCountryCode")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("CountryOfBirth");
+                    b.HasOne("MMAC.Models.Master.Country", "Nationality")
+                        .WithMany("Travellers")
+                        .HasForeignKey("NationalityCode")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MMAC.Models.Master.Country", "PlaceOfBirth")
+                        .WithMany()
+                        .HasForeignKey("PlaceOfBirthCode")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MMAC.Models.Master.Country", "PlaceOfResidence")
+                        .WithMany()
+                        .HasForeignKey("PlaceOfResidenceCode")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("IssuedCountry");
+
+                    b.Navigation("Nationality");
+
+                    b.Navigation("PlaceOfBirth");
+
+                    b.Navigation("PlaceOfResidence");
                 });
 
             modelBuilder.Entity("MMAC.Models.Master.PortOfArrival", b =>

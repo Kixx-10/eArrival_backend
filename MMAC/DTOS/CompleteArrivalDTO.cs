@@ -13,9 +13,10 @@
         public string NationalityCode { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string? UID { get; set; }
+        public string Occupation { get; set; } = string.Empty;
         public string PlaceOfBirthCode { get; set; } = string.Empty;
         public string MobileNumber { get; set; } = string.Empty;
-        public string Address { get; set; } = string.Empty;
+        public string PlaceOfResidenceCode { get; set; } = string.Empty;
 
         public string? VisaNo { get; set; }
 

@@ -83,11 +83,12 @@ namespace MMAC.Migrations
                     FullName = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
                     Gender = table.Column<string>(type: "character varying(1)", maxLength: 1, nullable: false),
                     DOB = table.Column<DateTime>(type: "date", nullable: false),
-                    CountryOfBirthCode = table.Column<string>(type: "varchar(3)", maxLength: 3, nullable: false),
+                    NationalityCode = table.Column<string>(type: "varchar(3)", maxLength: 3, nullable: false),
+                    PlaceOfBirthCode = table.Column<string>(type: "varchar(3)", maxLength: 3, nullable: false),
                     Email = table.Column<string>(type: "varchar(30)", maxLength: 30, nullable: false),
                     Occupation = table.Column<string>(type: "varchar(30)", maxLength: 30, nullable: false),
                     MobileNumber = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
-                    Address = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    PlaceOfResidenceCode = table.Column<string>(type: "varchar(3)", maxLength: 3, nullable: false),
                     VisaNo = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     NRC = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: true),
                     UID = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true),
@@ -103,11 +104,29 @@ namespace MMAC.Migrations
                 {
                     table.PrimaryKey("PK_Traveller", x => x.TravellerId);
                     table.ForeignKey(
-                        name: "FK_Traveller_Country_CountryOfBirthCode",
-                        column: x => x.CountryOfBirthCode,
+                        name: "FK_Traveller_Country_IssuedCountryCode",
+                        column: x => x.IssuedCountryCode,
                         principalTable: "Country",
                         principalColumn: "CountryISOAlpha3Code",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Traveller_Country_NationalityCode",
+                        column: x => x.NationalityCode,
+                        principalTable: "Country",
+                        principalColumn: "CountryISOAlpha3Code",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Traveller_Country_PlaceOfBirthCode",
+                        column: x => x.PlaceOfBirthCode,
+                        principalTable: "Country",
+                        principalColumn: "CountryISOAlpha3Code",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Traveller_Country_PlaceOfResidenceCode",
+                        column: x => x.PlaceOfResidenceCode,
+                        principalTable: "Country",
+                        principalColumn: "CountryISOAlpha3Code",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -247,6 +266,7 @@ namespace MMAC.Migrations
                     PurposeOfVisit = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     PreviousCity = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     HealthDeclaration = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    HealthRecordUrl = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true),
                     DigitalDeclarations = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     ApprovedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     ApprovedUser = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
@@ -328,9 +348,24 @@ namespace MMAC.Migrations
                 column: "DistrictId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Traveller_CountryOfBirthCode",
+                name: "IX_Traveller_IssuedCountryCode",
                 table: "Traveller",
-                column: "CountryOfBirthCode");
+                column: "IssuedCountryCode");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Traveller_NationalityCode",
+                table: "Traveller",
+                column: "NationalityCode");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Traveller_PlaceOfBirthCode",
+                table: "Traveller",
+                column: "PlaceOfBirthCode");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Traveller_PlaceOfResidenceCode",
+                table: "Traveller",
+                column: "PlaceOfResidenceCode");
         }
 
         /// <inheritdoc />
