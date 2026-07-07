@@ -1,5 +1,4 @@
-﻿
-using Hangfire;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MMAC.Data;
@@ -11,6 +10,7 @@ namespace MMAC.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ApplicationController : ControllerBase
     {
         private readonly ICompleteArrivalService _completeArrival;
@@ -26,6 +26,7 @@ namespace MMAC.Controllers
         }
 
         [HttpPost("Submit&UpdateApplication")]
+        [AllowAnonymous]
         public async Task<IActionResult> Submit([FromBody] CompleteArrivalDTO model)
         {
             if (!ModelState.IsValid)
@@ -37,26 +38,22 @@ namespace MMAC.Controllers
             {
                 var result = await _completeArrival.SubmitAsync(model);
 
-                BackgroundJob.Schedule<ICompleteArrivalService>(service => service.AutoExpireApplicationAsync(result.ApplicationNo),
-                TimeSpan.FromMinutes(15)
-                );
-
                 if (result.ApplicationNo == Guid.Empty)
                 {
                     return BadRequest(new { message = "Failed to Submit ArrivalApplication" });
                 }
 
-                // 💡 ၁။ Database မှ Master Data (Country နှင့် Address Text များ) ကို ဆွဲထုတ်ခြင်း
-                var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryCode == model.CountryOfBirthCode);
-                string countryName = country?.Name ?? model.CountryOfBirthCode; // မရှိခဲ့လျှင် Code ကိုသာပြမည်
 
-                // Township မှတစ်ဆင့် District နှင့် StateRegion ကို Include သုံးပြီး တစ်ကြိမ်တည်း ဆွဲထုတ်ပါသည် (Performance ကောင်းစေရန်)
+                var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryCode == model.NationalityCode);
+                string countryName = country?.Name ?? model.NationalityCode;
+
+
                 var township = await _context.Township
                     .Include(t => t.District)
                         .ThenInclude(d => d.StateRegion)
                     .FirstOrDefaultAsync(t => t.Id == model.TownshipId);
 
-                // 💡 ၂။ Address In Myanmar တည်ဆောက်ခြင်း (Address + Township + District + State/Region)
+
                 var addressParts = new List<string>();
                 if (!string.IsNullOrWhiteSpace(model.AddressInMyanmar)) addressParts.Add(model.AddressInMyanmar);
                 if (township != null) addressParts.Add(township.Name);
@@ -66,7 +63,6 @@ namespace MMAC.Controllers
                 string fullAddress = string.Join(", ", addressParts);
                 if (string.IsNullOrWhiteSpace(fullAddress)) fullAddress = "N/A";
 
-                // 💡 ၃။ ပြင်ဆင်ထားသော Parameter အသစ်များဖြင့် လှမ်းခေါ်ခြင်း
                 byte[] pdfBytes = await _pdfService.GenerateArrivalPdfAsync(model, result.ApplicationNo, result.ReferenceNo, countryName, fullAddress);
                 string pdfBase64 = Convert.ToBase64String(pdfBytes);
 
@@ -75,7 +71,10 @@ namespace MMAC.Controllers
                     message = "Application submitted successfully",
                     applicationNo = result.ApplicationNo.ToString(),
                     referenceNo = result.ReferenceNo ?? "N/A",
-                    pdfData = pdfBase64
+                    token = result.Token,
+                    pdfData = pdfBase64,
+
+
                 });
             }
             catch (Exception ex)
@@ -106,8 +105,8 @@ namespace MMAC.Controllers
 
             try
             {
-                var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryCode == request.Model.CountryOfBirthCode);
-                string countryName = country?.Name ?? request.Model.CountryOfBirthCode;
+                var country = await _context.Country.FirstOrDefaultAsync(c => c.CountryCode == request.Model.NationalityCode);
+                string countryName = country?.Name ?? request.Model.NationalityCode;
 
                 var township = await _context.Township
                     .Include(t => t.District)

@@ -5,25 +5,24 @@
 namespace MMAC.Migrations
 {
     /// <inheritdoc />
-    public partial class AddReferenceNoInArrivalApplication : Migration
+    public partial class addHealthDeclerationURL : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "ReferenceNo",
+                name: "HealthRecordUrl",
                 table: "ArrivalApplication",
-                type: "varchar(20)",
-                maxLength: 20,
-                nullable: false,
-                defaultValue: "");
+                type: "varchar(255)",
+                maxLength: 255,
+                nullable: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "ReferenceNo",
+                name: "HealthRecordUrl",
                 table: "ArrivalApplication");
         }
     }

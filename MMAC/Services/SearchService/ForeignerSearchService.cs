@@ -33,7 +33,7 @@ namespace MMAC.Services.UpdateService
             }
 
             bool isIdentityMatched = app.Traveller.PassportNo.ToLower() == dto.PassportNo.ToLower()
-                                  && app.Traveller.CountryOfBirthCode.ToLower() == dto.CountryOfBirthCode.ToLower()
+                                  && app.Traveller.NationalityCode.ToLower() == dto.CountryOfBirthCode.ToLower()
                                   && app.Traveller.ExpiryDate.Date == dto.ExpiryDate.Date
                                   && app.Traveller.DOB.Date == dto.DOB.Date;
 

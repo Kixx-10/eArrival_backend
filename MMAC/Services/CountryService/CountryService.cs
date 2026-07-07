@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using MMAC.Data; // 1. Pulls in their Data folder seamlessly
 using MMAC.Interfaces;
 using MMAC.Models.Master;
-using MMAC.Data; // 1. Pulls in their Data folder seamlessly
 
 namespace MMAC.Services
 {
@@ -16,11 +14,19 @@ namespace MMAC.Services
             _context = context;
         }
 
-        // Logic for: GET ALL Countries
-        public async Task<IEnumerable<Country>> GetAllCountriesAsync()
+        public async Task<IEnumerable<Country>> GetPassportIssuedCountryAsync()
         {
             // 3. Matches their DbSet name which is "_context.Country"
             return await _context.Country.AsNoTracking().ToListAsync();
+        }
+        public async Task<IEnumerable<Country>> GetNationalityCountryAsync()
+        {
+            // 3. Matches their DbSet name which is "_context.Country"
+            return await _context
+                .Country
+                .AsNoTracking()
+                .Where(c => c.Type == Country.CountryType.Nationality)
+                .ToListAsync();
         }
 
         // Logic for: GET COUNTRY BY ID (Code)

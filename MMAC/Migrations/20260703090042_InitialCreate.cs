@@ -19,7 +19,8 @@ namespace MMAC.Migrations
                     CountryISOAlpha3Code = table.Column<string>(type: "varchar(3)", maxLength: 3, nullable: false),
                     Name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
                     NameMM = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "date", nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "date", nullable: false, defaultValueSql: "CURRENT_DATE"),
                     UpdatedDate = table.Column<DateTime>(type: "date", nullable: true)
                 },
                 constraints: table =>
@@ -79,16 +80,17 @@ namespace MMAC.Migrations
                 columns: table => new
                 {
                     TravellerId = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    FullName = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    FullName = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
                     Gender = table.Column<string>(type: "character varying(1)", maxLength: 1, nullable: false),
                     DOB = table.Column<DateTime>(type: "date", nullable: false),
                     CountryOfBirthCode = table.Column<string>(type: "varchar(3)", maxLength: 3, nullable: false),
                     Email = table.Column<string>(type: "varchar(30)", maxLength: 30, nullable: false),
+                    Occupation = table.Column<string>(type: "varchar(30)", maxLength: 30, nullable: false),
                     MobileNumber = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
                     Address = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    VisaNo = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    VisaNo = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     NRC = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: true),
+                    UID = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true),
                     FatherName = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     PassportNo = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
                     IssuedCountryCode = table.Column<string>(type: "varchar(3)", maxLength: 3, nullable: false),
@@ -186,7 +188,7 @@ namespace MMAC.Migrations
                     LogId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     LogTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    TravellerId = table.Column<Guid>(type: "uuid", nullable: false),
                     LogIPAddr = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
                     Activity = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
                     Inputted = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true)
@@ -195,8 +197,8 @@ namespace MMAC.Migrations
                 {
                     table.PrimaryKey("PK_AuditLogs", x => x.LogId);
                     table.ForeignKey(
-                        name: "FK_AuditLogs_Traveller_UserId",
-                        column: x => x.UserId,
+                        name: "FK_AuditLogs_Traveller_TravellerId",
+                        column: x => x.TravellerId,
                         principalTable: "Traveller",
                         principalColumn: "TravellerId",
                         onDelete: ReferentialAction.Cascade);
@@ -229,23 +231,23 @@ namespace MMAC.Migrations
                 columns: table => new
                 {
                     AppNo = table.Column<Guid>(type: "uuid", nullable: false),
+                    ReferenceNo = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
                     TravellerId = table.Column<Guid>(type: "uuid", nullable: false),
                     AppStatus = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: false),
                     ArrivalDate = table.Column<DateTime>(type: "date", nullable: false),
                     ModeOfTravelId = table.Column<int>(type: "integer", nullable: false),
                     PortOfArrivalId = table.Column<int>(type: "integer", nullable: false),
-                    VehicleNumber = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: true),
-                    VehicleName = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: true),
-                    Accommodation = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
-                    AddressInMyanmar = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    VehicleNumber = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
+                    Accommodation = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    AddressInMyanmar = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     TownshipId = table.Column<int>(type: "integer", nullable: false),
                     DistrictId = table.Column<int>(type: "integer", nullable: false),
                     StateRegionId = table.Column<int>(type: "integer", nullable: false),
-                    MobileNumberMM = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
+                    MobileNumberMM = table.Column<string>(type: "varchar(11)", maxLength: 11, nullable: true),
                     PurposeOfVisit = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    PreviousCity = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
-                    HealthDeclaration = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    DigitalDeclarations = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    PreviousCity = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    HealthDeclaration = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    DigitalDeclarations = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     ApprovedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     ApprovedUser = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true),
                     CreatedDate = table.Column<DateTime>(type: "date", nullable: false),
@@ -301,9 +303,9 @@ namespace MMAC.Migrations
                 column: "TravellerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AuditLogs_UserId",
+                name: "IX_AuditLogs_TravellerId",
                 table: "AuditLogs",
-                column: "UserId");
+                column: "TravellerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_District_SRId",

@@ -165,7 +165,6 @@ namespace MMAC.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("AddressInMyanmar")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -199,6 +198,10 @@ namespace MMAC.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<string>("HealthRecordUrl")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("MobileNumberMM")
                         .HasMaxLength(11)
@@ -237,11 +240,6 @@ namespace MMAC.Migrations
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("date");
 
-                    b.Property<string>("VehicleName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
-
                     b.Property<string>("VehicleNumber")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -271,11 +269,6 @@ namespace MMAC.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<string>("CountryOfBirthCode")
-                        .IsRequired()
-                        .HasMaxLength(3)
-                        .HasColumnType("varchar(3)");
-
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("date");
 
@@ -296,8 +289,8 @@ namespace MMAC.Migrations
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
 
                     b.Property<string>("Gender")
                         .IsRequired()
@@ -321,10 +314,29 @@ namespace MMAC.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("character varying(30)");
 
+                    b.Property<string>("NationalityCode")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("varchar(3)");
+
+                    b.Property<string>("Occupation")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)");
+
                     b.Property<string>("PassportNo")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
+
+                    b.Property<string>("PlaceOfBirthCode")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("varchar(3)");
+
+                    b.Property<string>("UID")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("date");
@@ -335,7 +347,11 @@ namespace MMAC.Migrations
 
                     b.HasKey("TravellerId");
 
-                    b.HasIndex("CountryOfBirthCode");
+                    b.HasIndex("IssuedCountryCode");
+
+                    b.HasIndex("NationalityCode");
+
+                    b.HasIndex("PlaceOfBirthCode");
 
                     b.ToTable("Traveller");
                 });
@@ -348,7 +364,9 @@ namespace MMAC.Migrations
                         .HasColumnName("CountryISOAlpha3Code");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("date");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("date")
+                        .HasDefaultValueSql("CURRENT_DATE");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -359,6 +377,9 @@ namespace MMAC.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("date");
@@ -579,13 +600,29 @@ namespace MMAC.Migrations
 
             modelBuilder.Entity("MMAC.Models.Cores.Traveller", b =>
                 {
-                    b.HasOne("MMAC.Models.Master.Country", "CountryOfBirth")
-                        .WithMany("Travellers")
-                        .HasForeignKey("CountryOfBirthCode")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("MMAC.Models.Master.Country", "IssuedCountry")
+                        .WithMany()
+                        .HasForeignKey("IssuedCountryCode")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("CountryOfBirth");
+                    b.HasOne("MMAC.Models.Master.Country", "Nationality")
+                        .WithMany("Travellers")
+                        .HasForeignKey("NationalityCode")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MMAC.Models.Master.Country", "PlaceOfBirth")
+                        .WithMany()
+                        .HasForeignKey("PlaceOfBirthCode")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("IssuedCountry");
+
+                    b.Navigation("Nationality");
+
+                    b.Navigation("PlaceOfBirth");
                 });
 
             modelBuilder.Entity("MMAC.Models.Master.PortOfArrival", b =>

@@ -51,18 +51,11 @@ namespace MMAC.Models.Cores
         [Column(TypeName = "varchar(20)")]
         public string VehicleNumber { get; set; } = string.Empty;
 
-        [Required]
-        [MaxLength(50)]
-        [Column(TypeName = "varchar(50)")]
-        public string VehicleName { get; set; } = string.Empty;
-
         [MaxLength(100)]
         public string? Accommodation { get; set; }
 
-        [Required]
         [MaxLength(100)]
-        public string AddressInMyanmar { get; set; } = string.Empty;
-
+        public string? AddressInMyanmar { get; set; }
 
         [Required]
         public int TownshipId { get; set; }
@@ -88,6 +81,10 @@ namespace MMAC.Models.Cores
         [Required]
         [MaxLength(100)]
         public string HealthDeclaration { get; set; } = string.Empty;
+
+        [MaxLength(255)]
+        [Column(TypeName = "varchar(255)")]
+        public string? HealthRecordUrl { get; set; }
 
         [Required]
         [MaxLength(100)]

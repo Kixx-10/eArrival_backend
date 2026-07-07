@@ -1,20 +1,11 @@
-﻿using Aspose.Slides;
-using MMAC.DTOS;
+﻿using MMAC.DTOS;
+using MMAC.Services.AuditLogService;
 using QRCoder;
 using Spire.Pdf;
 using Spire.Pdf.Graphics;
-using Spire.Pdf.Tables;
-using System;
-using System.Data;
 using System.Drawing;
-using System.IO;
 using System.Net;
 using System.Net.Mail;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using MMAC.Services.AuditLogService;
-using MMAC.Models.Cores;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace MMAC.Services.PdfService
 {
@@ -237,6 +228,6 @@ namespace MMAC.Services.PdfService
                 }
             });
         }
-    
+
     }
 }
