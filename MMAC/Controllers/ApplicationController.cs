@@ -84,6 +84,7 @@ namespace MMAC.Controllers
         }
 
         [HttpPost("SendApplicationEmail")]
+        [AllowAnonymous]
         public async Task<IActionResult> SendEmail([FromBody] SendEmailRequestDTO request)
         {
             if (request == null || request.Model == null)
