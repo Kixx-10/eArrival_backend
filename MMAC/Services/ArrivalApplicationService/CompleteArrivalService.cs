@@ -152,14 +152,14 @@ namespace MMAC.Services.ArrivalInterface
                     throw new InvalidOperationException("This Arrival card is Expired.");
                 }
 
-                if (app.AppStatus?.Equals("Rejected", StringComparison.OrdinalIgnoreCase) == true)
+                if (app.AppStatus?.Equals("Departed", StringComparison.OrdinalIgnoreCase) == true)
                 {
-                    throw new InvalidOperationException("This Traveller has already been rejected.");
+                    throw new InvalidOperationException("This Traveller has already been Departed.");
                 }
 
-                if (app.AppStatus?.Equals("Approved", StringComparison.OrdinalIgnoreCase) == true)
+                if (app.AppStatus?.Equals("Arrived", StringComparison.OrdinalIgnoreCase) == true)
                 {
-                    throw new InvalidOperationException("This Traveller already Approved.");
+                    throw new InvalidOperationException("This Traveller already Arrived.");
                 }
 
                 //Success
