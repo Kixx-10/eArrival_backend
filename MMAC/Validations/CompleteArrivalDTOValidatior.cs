@@ -35,7 +35,7 @@ namespace MMAC.Validations
             RuleFor(x => x.MobileNumber).NotEmpty().WithMessage("Moblie No is required")
                 .MaximumLength(20).WithMessage("Mobile No cannot more 20 characters");
 
-            RuleFor(x => x.PlaceOfResidenceCode).NotEmpty().WithMessage("PlaceOfResidence is required")
+            RuleFor(x => x.PlaceOfResidenceCode).NotEmpty().WithMessage("Place of residence is required")
                 .MaximumLength(3).WithMessage("PlaceOfResidenceCode cannot more 3 characters");
 
             RuleFor(x => x.NRC).MaximumLength(30).WithMessage("NRC cannot more 30 characters");

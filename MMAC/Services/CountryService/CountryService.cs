@@ -14,20 +14,27 @@ namespace MMAC.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<Country>> GetPassportIssuedCountryAsync()
+        public async Task<IEnumerable<Country>> GetAllCountresAsync()
         {
             // 3. Matches their DbSet name which is "_context.Country"
             return await _context.Country.AsNoTracking().ToListAsync();
         }
-        public async Task<IEnumerable<Country>> GetNationalityCountryAsync()
+        public async Task<IEnumerable<Country>> GetIcaoMemberCountriesAsync()
         {
-            // 3. Matches their DbSet name which is "_context.Country"
-            return await _context
-                .Country
+            return await _context.Country
                 .AsNoTracking()
-                .Where(c => c.Type == Country.CountryType.Nationality)
+                .Where(c => c.IsICAOMember == true) // bool ဖြစ်တဲ့အတွက် ရှင်းလင်းသွားတယ်
                 .ToListAsync();
         }
+        //public async Task<IEnumerable<Country>> GetNationalityCountryAsync()
+        //{
+        //    // 3. Matches their DbSet name which is "_context.Country"
+        //    return await _context
+        //        .Country
+        //        .AsNoTracking()
+        //        .Where(c => c.Type == Country.CountryType.Nationality)
+        //        .ToListAsync();
+        //}
 
         // Logic for: GET COUNTRY BY ID (Code)
         public async Task<Country?> GetCountryByCodeAsync(string code)

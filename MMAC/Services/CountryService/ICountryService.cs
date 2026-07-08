@@ -4,8 +4,8 @@ namespace MMAC.Interfaces
 {
     public interface ICountryService
     {
-        Task<IEnumerable<Country>> GetPassportIssuedCountryAsync();
-        Task<IEnumerable<Country>> GetNationalityCountryAsync();
+        Task<IEnumerable<Country>> GetAllCountresAsync();
+        Task<IEnumerable<Country>> GetIcaoMemberCountriesAsync();
 
 
         Task<Country?> GetCountryByCodeAsync(string code);

@@ -46,12 +46,7 @@ namespace MMAC.Data
                 .Property(c => c.CreatedDate)
                 .HasDefaultValueSql("CURRENT_DATE");
 
-
-            modelBuilder.Entity<Country>()
-                .Property(c => c.Type)
-                .HasConversion<int>();
-
-            // ၄။ AuditLogs  Relationship 
+            //  AuditLogs  Relationship 
             modelBuilder.Entity<AuditLogs>()
                 .HasOne(a => a.Traveller)
                 .WithMany(t => t.AuditLogs)
