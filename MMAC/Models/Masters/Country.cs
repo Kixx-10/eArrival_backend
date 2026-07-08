@@ -22,10 +22,13 @@ namespace MMAC.Models.Master
         [MaxLength(100)]
         public string NameMM { get; set; } = string.Empty;
 
-        public enum CountryType { Nationality = 1, PassportIssued = 0 }
+        //public enum CountryType { Nationality = 1, PassportIssued = 0 }
+
+        //[Required]
+        //public CountryType IsICAOMember { get; set; }
 
         [Required]
-        public CountryType Type { get; set; }
+        public bool IsICAOMember { get; set; }
 
         [Required]
         [Column(TypeName = "date")]

@@ -148,10 +148,10 @@ app.UseCors("AllowAll");
 //    appBuilder => appBuilder.UseMiddleware<ApiKeyMiddleware>()
 //);
 
-app.UseCors("AllowAll");           //  CORS
+app.UseCors("AllowAll");//  CORS
+app.UseStaticFiles();
 app.UseAuthentication();           //  Auth (read JWT)
 app.UseAuthorization();            //  Authorize (check claims)
-
 app.MapControllers();              // Controllers
 
 // 5. Hangfire dashboard — no auth in dev

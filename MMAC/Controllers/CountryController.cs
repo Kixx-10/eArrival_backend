@@ -19,19 +19,19 @@ namespace MMAC.Controllers
         }
 
 
-        [HttpGet("PassportIssuedCountry")]
+        [HttpGet("AllCountries")]
         [AllowAnonymous]
         public async Task<IActionResult> GetPassportIssuedCountry()
         {
-            var countries = await _countryService.GetPassportIssuedCountryAsync();
+            var countries = await _countryService.GetAllCountresAsync();
             return Ok(countries);
         }
 
-        [HttpGet("NationalityCountry")]
+        [HttpGet("IcaoMemberCountries")]
         [AllowAnonymous]
         public async Task<IActionResult> GetNationalityCountry()
         {
-            var countries = await _countryService.GetNationalityCountryAsync();
+            var countries = await _countryService.GetIcaoMemberCountriesAsync();
             return Ok(countries);
         }
 
