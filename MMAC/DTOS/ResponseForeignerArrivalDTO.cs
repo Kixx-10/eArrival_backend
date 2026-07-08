@@ -7,10 +7,12 @@
         public string FullName { get; set; } = string.Empty;
         public string Gender { get; set; } = string.Empty;
         public DateTime DOB { get; set; }
-        public string CountryOfBirthCode { get; set; } = string.Empty;
+        public required string NationalityCode { get; set; }
         public string Email { get; set; } = string.Empty;
         public string MobileNumber { get; set; } = string.Empty;
-        public string Address { get; set; } = string.Empty;
+        public required string PlaceOfResidenceCode { get; set; } //changed to required
+        public required string PlaceOfBirthCode { get; set; } //added place of birth code
+        public required string Occupation { get; set;  } = string.Empty; //added occupation
         public string VisaNo { get; set; } = string.Empty;
         public string PassportNo { get; set; } = string.Empty;
         public string IssuedCountryCode { get; set; } = string.Empty;
@@ -21,8 +23,8 @@
         public DateTime ArrivalDate { get; set; }
         public string? VehicleNumber { get; set; }
         public string? VehicleName { get; set; }
-        public string Accommodation { get; set; } = string.Empty;
-        public string AddressInMyanmar { get; set; } = string.Empty;
+        public string Accommodation { get; set; } = string.Empty;//
+        public string AddressInMyanmar { get; set; } = string.Empty;//
         public string PurposeOfVisit { get; set; } = string.Empty;
         public string? PreviousCity { get; set; }
         public string? HealthDeclaration { get; set; }
