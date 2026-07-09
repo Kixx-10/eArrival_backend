@@ -29,6 +29,10 @@
         public string? PreviousCity { get; set; }
         public string? HealthDeclaration { get; set; }
         public string? HealthRecordUrl { get; set; }
+
+        //original file name
+
+        public string? HealthRecordFileName { get; set; }
         public string? DigitalDeclarations { get; set; }
 
         // Master Data Names

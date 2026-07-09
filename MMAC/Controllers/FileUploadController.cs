@@ -62,8 +62,8 @@ namespace MMAC.Controllers
                 await file.CopyToAsync(stream);
             }
 
-            // ── Build public URL ──────────────────────────────────────────────
-            // e.g. https://yourdomain.com/uploads/health-records/abc123.pdf
+            // ── Build public URL
+            //  https://domain.com/uploads/health-records/abc123.pdf
             var baseUrl = _config["AppSettings:BaseUrl"]
                 ?? $"{Request.Scheme}://{Request.Host}";
             var fileUrl = $"{baseUrl}/uploads/health-records/{uniqueFileName}";
@@ -73,6 +73,7 @@ namespace MMAC.Controllers
                 message = "File uploaded successfully.",
                 fileUrl = fileUrl,
                 fileName = uniqueFileName,
+                originalFileName = file.FileName //for show original name in frontend
             });
         }
     }

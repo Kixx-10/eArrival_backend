@@ -29,6 +29,9 @@
         public string PreviousCity { get; set; } = string.Empty;
         public string HealthDeclaration { get; set; } = string.Empty;
         public string? HealthRecordUrl { get; set; } = string.Empty;
+
+        //original file name
+        public string? HealthRecordFileName { get; set; }
         public string DigitalDeclarations { get; set; } = string.Empty;
 
         // Master Data Names
