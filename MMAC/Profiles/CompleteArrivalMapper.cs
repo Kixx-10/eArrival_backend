@@ -12,10 +12,20 @@ namespace MMAC.Profiles
             CreateMap<CompleteArrivalDTO, ArrivalApplication>().ReverseMap();
             CreateMap<ResponseCompleteArrivalDTO, Traveller>().ReverseMap();
             CreateMap<ResponseCompleteArrivalDTO, ArrivalApplication>().ReverseMap();
-            CreateMap<ArrivalApplication, ResponseForeignerArrivalDTO>();
-            CreateMap<Traveller, ResponseForeignerArrivalDTO>();
-            CreateMap<ArrivalApplication, ResponseMyanmarArrivalDTO>();
-            CreateMap<Traveller, ResponseMyanmarArrivalDTO>();
+
+            CreateMap<ArrivalApplication, ResponseForeignerArrivalDTO>()
+                .ForMember(dest => dest.HealthRecordUrl, opt => opt.MapFrom(src => src.HealthRecordUrl))
+                .ReverseMap();
+
+            CreateMap<Traveller, ResponseForeignerArrivalDTO>()
+                .ReverseMap();
+
+            CreateMap<ArrivalApplication, ResponseMyanmarArrivalDTO>()
+                .ForMember(dest => dest.HealthRecordUrl, opt => opt.MapFrom(src => src.HealthRecordUrl))
+                .ReverseMap();
+
+            CreateMap<Traveller, ResponseMyanmarArrivalDTO>()
+                .ReverseMap();
         }
     }
 }
