@@ -12,7 +12,7 @@
         public string MobileNumber { get; set; } = string.Empty;
         public required string PlaceOfResidenceCode { get; set; } //changed to required
         public required string PlaceOfBirthCode { get; set; } //added place of birth code
-        public required string Occupation { get; set;  } = string.Empty; //added occupation
+        public required string Occupation { get; set; } = string.Empty; //added occupation
         public string VisaNo { get; set; } = string.Empty;
         public string PassportNo { get; set; } = string.Empty;
         public string IssuedCountryCode { get; set; } = string.Empty;
@@ -28,6 +28,7 @@
         public string PurposeOfVisit { get; set; } = string.Empty;
         public string? PreviousCity { get; set; }
         public string? HealthDeclaration { get; set; }
+        public string? HealthRecordUrl { get; set; }
         public string? DigitalDeclarations { get; set; }
 
         // Master Data Names

@@ -7,10 +7,10 @@
         public string FullName { get; set; } = string.Empty;
         public string Gender { get; set; } = string.Empty;
         public DateTime DOB { get; set; }
-        public required  string NationalityCode { get; set; } 
+        public required string NationalityCode { get; set; }
         public string NRC { get; set; } = string.Empty;
         public required string FatherName { get; set; } //added required (T)
-        public required string Occupation {  get; set; } // added occupation (T)
+        public required string Occupation { get; set; } // added occupation (T)
         public string Email { get; set; } = string.Empty;
         public string MobileNumber { get; set; } = string.Empty;
         public required string PlaceOfBirthCode { get; set; } //added PlaceOfBirthCode (T)
@@ -28,6 +28,7 @@
         public string PurposeOfVisit { get; set; } = string.Empty;
         public string PreviousCity { get; set; } = string.Empty;
         public string HealthDeclaration { get; set; } = string.Empty;
+        public string? HealthRecordUrl { get; set; } = string.Empty;
         public string DigitalDeclarations { get; set; } = string.Empty;
 
         // Master Data Names
