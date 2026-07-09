@@ -42,6 +42,10 @@
         public string PreviousCity { get; set; } = string.Empty;
         public string HealthDeclaration { get; set; } = string.Empty;
         public string? HealthRecordUrl { get; set; }
+
+
+        //if no need to remove
+        public string? HealthRecordFileName { get; set; }
         public string DigitalDeclarations { get; set; } = string.Empty;
     }
 }

@@ -86,6 +86,11 @@ namespace MMAC.Models.Cores
         [Column(TypeName = "varchar(255)")]
         public string? HealthRecordUrl { get; set; }
 
+        //original file name
+        [MaxLength(255)]
+        [Column(TypeName = "varchar(255)")]
+        public string? HealthRecordFileName { get; set; }
+
         [Required]
         [MaxLength(100)]
         public string DigitalDeclarations { get; set; } = string.Empty;
