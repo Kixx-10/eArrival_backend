@@ -81,10 +81,6 @@ namespace MMAC.Validations
             RuleFor(x => x.Accommodation)
                 .MaximumLength(50).WithMessage("Accommodation info cannot exceed 20 characters.");
 
-            RuleFor(x => x.AddressInMyanmar)
-                .NotEmpty().WithMessage("Address in Myanmar is required.")
-                .MaximumLength(100).WithMessage("Address in Myanmar cannot exceed 100 characters.");
-
             RuleFor(x => x.TownshipId).GreaterThan(0).WithMessage("Township Selection is required.");
 
             RuleFor(x => x.DistrictId).GreaterThan(0).WithMessage("District Selection is required.");
