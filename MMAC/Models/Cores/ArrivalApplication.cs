@@ -54,7 +54,7 @@ namespace MMAC.Models.Cores
         [MaxLength(100)]
         public string? Accommodation { get; set; }
 
-        [MaxLength(100)]
+        [MaxLength(255)]
         public string? AddressInMyanmar { get; set; }
 
         [Required]
@@ -87,13 +87,22 @@ namespace MMAC.Models.Cores
         public string? HealthRecordUrl { get; set; }
 
         //original file name
-        [MaxLength(255)]
-        [Column(TypeName = "varchar(255)")]
+        [MaxLength(100)]
+        [Column(TypeName = "varchar(100)")]
         public string? HealthRecordFileName { get; set; }
 
         [Required]
         [MaxLength(100)]
         public string DigitalDeclarations { get; set; } = string.Empty;
+
+        [MaxLength(255)]
+        [Column(TypeName = "varchar(255)")]
+        public string? GoodsRecordUrl { get; set; }
+
+        //original file name
+        [MaxLength(100)]
+        [Column(TypeName = "varchar(100)")]
+        public string? GoodsRecordFileName { get; set; }
 
         public DateTime? ApprovedDate { get; set; }
 

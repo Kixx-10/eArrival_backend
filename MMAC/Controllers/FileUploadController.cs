@@ -76,5 +76,36 @@ namespace MMAC.Controllers
                 originalFileName = file.FileName //for show original name in frontend
             });
         }
+
+        // POST /api/FileUpload/DigitalRecord
+        [HttpPost("DigitalRecord")]
+        public async Task<IActionResult> UploadDigitalRecord(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest(new { message = "No file received." });
+
+            // ── Save to wwwroot/uploads/digital-records/ ──────────────────────
+            var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "digital-records");
+            Directory.CreateDirectory(uploadsFolder);
+
+            var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName).ToLowerInvariant()}";
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var baseUrl = _config["AppSettings:BaseUrl"] ?? $"{Request.Scheme}://{Request.Host}";
+            var fileUrl = $"{baseUrl}/uploads/digital-records/{uniqueFileName}";
+
+            return Ok(new
+            {
+                message = "Digital record uploaded successfully.",
+                fileUrl = fileUrl,
+                fileName = uniqueFileName,
+                originalFileName = file.FileName
+            });
+        }
     }
 }
