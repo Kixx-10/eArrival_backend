@@ -142,7 +142,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseRouting();
-app.UseCors("AllowAll");
+//app.UseCors("AllowAll");
 //app.UseWhen(
 //    context => !context.Request.Path.StartsWithSegments("/hangfire"),
 //    appBuilder => appBuilder.UseMiddleware<ApiKeyMiddleware>()
