@@ -89,15 +89,21 @@ namespace MMAC.Validations
 
             RuleFor(x => x.MobileNumberMM)
                 .MaximumLength(11).WithMessage("Myanmar Mobile Number cannot exceed 20 characters.");
+            RuleFor(x => x.AddressInMyanmar)
+                .MaximumLength(255).WithMessage("Address in Myanmar cannot exceed 255 characters.");
 
             RuleFor(x => x.PreviousCity)
                 .MaximumLength(50).WithMessage("Previous City cannot exceed 20 characters.");
 
             RuleFor(x => x.HealthDeclaration)
                 .MaximumLength(100).WithMessage("Health Declaration info cannot exceed 100 characters.");
+            RuleFor(x => x.HealthRecordFileName)
+                .MaximumLength(100).WithMessage("File name is too long!");
 
             RuleFor(x => x.DigitalDeclarations)
                 .MaximumLength(100).WithMessage("Digital Declarations info cannot exceed 100 characters.");
+            RuleFor(x => x.GoodsRecordFileName)
+                .MaximumLength(100).WithMessage("File name is too long!");
         }
     }
 }
