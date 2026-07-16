@@ -65,12 +65,6 @@ namespace MMAC.Data
                 .WithMany()
                 .HasForeignKey(t => t.PlaceOfBirthCode)
                 .OnDelete(DeleteBehavior.Restrict);
-            //Place of residence relationship
-            modelBuilder.Entity<Traveller>()
-                .HasOne(t => t.PlaceOfResidence)
-                .WithMany()
-                .HasForeignKey(t => t.PlaceOfResidenceCode)
-                .OnDelete(DeleteBehavior.Restrict);
 
             //  IssuedCountry Relationship
             modelBuilder.Entity<Traveller>()

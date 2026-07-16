@@ -14,7 +14,7 @@
         public string Email { get; set; } = string.Empty;
         public string MobileNumber { get; set; } = string.Empty;
         public required string PlaceOfBirthCode { get; set; } //added PlaceOfBirthCode (T)
-        public required string PlaceOfResidenceCode { get; set; } //change address to PlaceOfResidence (T)
+        public required string PlaceOfResidence { get; set; } //change address to PlaceOfResidence (T)
         public string PassportNo { get; set; } = string.Empty;
         public string IssuedCountryCode { get; set; } = string.Empty;
         public DateTime IssuedDate { get; set; }
@@ -28,11 +28,13 @@
         public string PurposeOfVisit { get; set; } = string.Empty;
         public string PreviousCity { get; set; } = string.Empty;
         public string HealthDeclaration { get; set; } = string.Empty;
-        public string? HealthRecordUrl { get; set; } = string.Empty;
+        public string? HealthRecordUrl { get; set; }
 
         //original file name
         public string? HealthRecordFileName { get; set; }
         public string DigitalDeclarations { get; set; } = string.Empty;
+        public string? GoodsRecordUrl { get; set; }
+        public string? GoodsRecordFileName { get; set; }
 
         // Master Data Names
         public string ModeOfTravelName { get; set; } = string.Empty;
