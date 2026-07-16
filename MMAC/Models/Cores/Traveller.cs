@@ -40,7 +40,7 @@ namespace MMAC.Models.Cores
         public virtual Country? PlaceOfBirth { get; set; }
 
         [Required]
-        [MaxLength(30)]
+        [MaxLength(50)]
         [Column(TypeName = "varchar(50)")]
         public string Email { get; set; } = string.Empty;
 
