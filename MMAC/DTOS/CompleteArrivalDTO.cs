@@ -16,7 +16,7 @@
         public string Occupation { get; set; } = string.Empty;
         public string PlaceOfBirthCode { get; set; } = string.Empty;
         public string MobileNumber { get; set; } = string.Empty;
-        public string PlaceOfResidenceCode { get; set; } = string.Empty;
+        public string PlaceOfResidence { get; set; } = string.Empty;
 
         public string? VisaNo { get; set; }
 

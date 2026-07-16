@@ -10,7 +10,7 @@
         public required string NationalityCode { get; set; }
         public string Email { get; set; } = string.Empty;
         public string MobileNumber { get; set; } = string.Empty;
-        public required string PlaceOfResidenceCode { get; set; } //changed to required
+        public required string PlaceOfResidence { get; set; } //changed to required
         public required string PlaceOfBirthCode { get; set; } //added place of birth code
         public required string Occupation { get; set; } = string.Empty; //added occupation
         public string VisaNo { get; set; } = string.Empty;
@@ -34,6 +34,8 @@
 
         public string? HealthRecordFileName { get; set; }
         public string? DigitalDeclarations { get; set; }
+        public string? GoodsRecordUrl { get; set; }
+        public string? GoodsRecordFileName { get; set; }
 
         // Master Data Names
         public string ModeOfTravelName { get; set; } = string.Empty;

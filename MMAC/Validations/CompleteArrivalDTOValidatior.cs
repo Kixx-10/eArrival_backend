@@ -9,7 +9,7 @@ namespace MMAC.Validations
         public CompleteArrivalDTOValidator()
         {
             RuleFor(x => x.FullName).NotEmpty().WithMessage("Name is required")
-                .MaximumLength(30).WithMessage("Name cannot more 50 characters");
+                .MaximumLength(50).WithMessage("Name cannot more 50 characters");
             RuleFor(x => x.Gender).NotEmpty().WithMessage("Select your gender")
                 .MaximumLength(1).WithMessage("Select M or F");
 
@@ -23,7 +23,7 @@ namespace MMAC.Validations
               .MaximumLength(3).WithMessage("Code maximum 3");
 
             RuleFor(x => x.Email).NotEmpty().WithMessage("Email is required")
-                .MaximumLength(30).WithMessage("Email cannot more 30 characters")
+                .MaximumLength(50).WithMessage("Email cannot more 50 characters")
                 .EmailAddress().WithMessage("Invalid email address");
 
             RuleFor(x => x.Occupation).NotEmpty().WithMessage("Occupation is required")
@@ -35,8 +35,8 @@ namespace MMAC.Validations
             RuleFor(x => x.MobileNumber).NotEmpty().WithMessage("Moblie No is required")
                 .MaximumLength(20).WithMessage("Mobile No cannot more 20 characters");
 
-            RuleFor(x => x.PlaceOfResidenceCode).NotEmpty().WithMessage("Place of residence is required")
-                .MaximumLength(3).WithMessage("PlaceOfResidenceCode cannot more 3 characters");
+            RuleFor(x => x.PlaceOfResidence).NotEmpty().WithMessage("Place of residence is required")
+                .MaximumLength(255).WithMessage("PlaceOfResidenceCode cannot more 255 characters");
 
             RuleFor(x => x.NRC).MaximumLength(30).WithMessage("NRC cannot more 30 characters");
 
@@ -76,7 +76,6 @@ namespace MMAC.Validations
 
             RuleFor(x => x.VehicleNumber)
                 .MaximumLength(20).WithMessage("Vehicle Number cannot exceed 10 characters.");
-
 
             RuleFor(x => x.Accommodation)
                 .MaximumLength(50).WithMessage("Accommodation info cannot exceed 20 characters.");

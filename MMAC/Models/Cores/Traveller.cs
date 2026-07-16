@@ -12,7 +12,7 @@ namespace MMAC.Models.Cores
         public Guid TravellerId { get; set; } = Guid.NewGuid();
 
         [Required]
-        [MaxLength(30)]
+        [MaxLength(50)]
         public string FullName { get; set; } = string.Empty;
 
         [Required]
@@ -41,7 +41,7 @@ namespace MMAC.Models.Cores
 
         [Required]
         [MaxLength(30)]
-        [Column(TypeName = "varchar(30)")]
+        [Column(TypeName = "varchar(50)")]
         public string Email { get; set; } = string.Empty;
 
         [Required]
@@ -55,11 +55,9 @@ namespace MMAC.Models.Cores
         public string MobileNumber { get; set; } = string.Empty;
 
         [Required]
-        [MaxLength(3)]
-        [Column(TypeName = "varchar(3)")]
-        public string PlaceOfResidenceCode { get; set; } = string.Empty;
-        [ForeignKey("PlaceOfResidenceCode")]
-        public virtual Country? PlaceOfResidence { get; set; }
+        [MaxLength(255)]
+        [Column(TypeName = "varchar(255)")]
+        public string PlaceOfResidence { get; set; } = string.Empty;
 
         [MaxLength(50)]
         public string? VisaNo { get; set; } = string.Empty;
