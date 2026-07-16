@@ -8,7 +8,8 @@
         public string Gender { get; set; } = string.Empty;
         public DateTime DOB { get; set; }
         public required string NationalityCode { get; set; }
-        public string NRC { get; set; } = string.Empty;
+        public string? NRC { get; set; }
+        public string? UID { get; set; }
         public required string FatherName { get; set; } //added required (T)
         public required string Occupation { get; set; } // added occupation (T)
         public string Email { get; set; } = string.Empty;
