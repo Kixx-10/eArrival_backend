@@ -12,7 +12,7 @@ namespace MMAC.Models.Cores
         public Guid TravellerId { get; set; } = Guid.NewGuid();
 
         [Required]
-        [MaxLength(30)]
+        [MaxLength(50)]
         public string FullName { get; set; } = string.Empty;
 
         [Required]
