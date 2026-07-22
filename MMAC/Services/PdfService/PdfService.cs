@@ -46,6 +46,7 @@ namespace MMAC.Services.PdfService
 
                 float currentY = 15f;
                 float pageWidth = page.Canvas.ClientSize.Width;
+                float col2X = (pageWidth / 2) + 10f; // ညာဘက် Column အတွက် X တည်နေရာ
 
                 // --- HEADER ---
                 PdfStringFormat centerFormat = new PdfStringFormat(PdfTextAlignment.Center);
@@ -75,10 +76,18 @@ namespace MMAC.Services.PdfService
                 textWidget.Draw(page, new RectangleF(10, currentY, pageWidth - 130, 60), textLayout);
                 currentY += 65f;
 
-                // --- PART I: Personal Particulars ---
-                page.Canvas.DrawRectangle(themePen, lightGrayBrush, new RectangleF(10, currentY, pageWidth - 20, 22));
-                page.Canvas.DrawString("PART I: Personal Particulars", sectionFont, themeBrush, 18, currentY + 4);
-                currentY += 32f;
+                // --- HELPER FUNCTION FOR MASKING ---
+                string MaskPassportNumber(string passportNo)
+                {
+                    if (string.IsNullOrEmpty(passportNo)) return string.Empty;
+                    if (passportNo.Length <= 4) return passportNo;
+
+                    string firstTwo = passportNo.Substring(0, 2);
+                    string lastTwo = passportNo.Substring(passportNo.Length - 2);
+                    string middleMask = new string('*', passportNo.Length - 4);
+
+                    return $"{firstTwo}{middleMask}{lastTwo}";
+                }
 
                 // Gender Mapping (M = Male, F = Female)
                 string formattedGender = model.Gender?.ToUpper() switch
@@ -88,15 +97,24 @@ namespace MMAC.Services.PdfService
                     _ => model.Gender ?? "N/A"
                 };
 
+                // --- PART I: Personal Particulars ---
+                page.Canvas.DrawRectangle(themePen, lightGrayBrush, new RectangleF(10, currentY, pageWidth - 20, 22));
+                page.Canvas.DrawString("PART I: Personal Particulars", sectionFont, themeBrush, 18, currentY + 4);
+                currentY += 32f;
+
+                // Row 1: FULL NAME & DATE OF BIRTH
                 DrawField(page, "FULL NAME", model.FullName, labelFont, valueFont, 10, currentY);
-                DrawField(page, "PASSPORT NUMBER", model.PassportNo, labelFont, valueFont, pageWidth / 2, currentY);
+                DrawField(page, "DATE OF BIRTH", model.DOB.ToString("yyyy-MM-dd"), labelFont, valueFont, col2X, currentY);
                 currentY += 38f;
 
+                // Row 2: COUNTRY & GENDER
                 DrawField(page, "COUNTRY", countryName, labelFont, valueFont, 10, currentY);
-                DrawField(page, "GENDER", formattedGender, labelFont, valueFont, pageWidth / 2, currentY);
+                DrawField(page, "GENDER", formattedGender, labelFont, valueFont, col2X, currentY);
                 currentY += 38f;
 
-                DrawField(page, "MOBILE NUMBER", model.MobileNumber, labelFont, valueFont, 10, currentY);
+                // Row 3: PASSPORT NUMBER & PASSPORT EXPIRE DATE
+                DrawField(page, "PASSPORT NUMBER", MaskPassportNumber(model.PassportNo), labelFont, valueFont, 10, currentY);
+                DrawField(page, "PASSPORT EXPIRE DATE", model.ExpiryDate.ToString("yyyy-MM-dd"), labelFont, valueFont, col2X, currentY);
                 currentY += 48f;
 
                 // --- PART II: Trip Details ---
@@ -104,10 +122,17 @@ namespace MMAC.Services.PdfService
                 page.Canvas.DrawString("PART II: Trip Details", sectionFont, themeBrush, 18, currentY + 4);
                 currentY += 32f;
 
+                // Row 1: DATE OF ARRIVAL & PURPOSE OF VISIT
                 DrawField(page, "DATE OF ARRIVAL", model.ArrivalDate.ToString("dd MMM yyyy"), labelFont, valueFont, 10, currentY);
-                DrawField(page, "PURPOSE OF VISIT", model.PurposeOfVisit, labelFont, valueFont, pageWidth / 2, currentY);
+                DrawField(page, "PURPOSE OF VISIT", model.PurposeOfVisit, labelFont, valueFont, col2X, currentY);
                 currentY += 38f;
 
+                // Row 2: PREVIOUS CITY & ACCOMMODATION
+                DrawField(page, "PREVIOUS CITY", model.PreviousCity, labelFont, valueFont, 10, currentY);
+                DrawField(page, "ACCOMMODATION", model.Accommodation, labelFont, valueFont, col2X, currentY);
+                currentY += 38f;
+
+                // Row 3: ADDRESS IN MYANMAR
                 DrawField(page, "ADDRESS IN MYANMAR", fullAddress, labelFont, valueFont, 10, currentY);
                 currentY += 52f;
 
